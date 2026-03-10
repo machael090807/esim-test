@@ -3,44 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2eSIM 一鍵安裝測試</title>
+    <title>2eSIM 極速安裝測試</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; text-decoration: none; color: white; }
-        .btn-install { background-color: #007AFF; } /* iOS 藍 */
-        .btn-copy { background-color: #34C759; } /* 綠色 */
-        .info { font-size: 12px; color: #666; margin-top: 20px; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; transition: 0.3s; }
+        .btn-primary { background-color: #007AFF; }
+        .btn-copy { background-color: #34C759; }
+        .guide { display: none; text-align: left; background: #fff3cd; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffeeba; }
+        h2 { color: #333; }
     </style>
 </head>
 <body>
 
-    <h2>2eSIM 技術測試頁</h2>
-    <p>請使用手機瀏覽器點擊下方按鈕</p>
+    <div class="card">
+        <h2>2eSIM 安裝優化測試</h2>
+        <p>解決單機無法掃描 QR Code 的問題</p>
 
-    <a href="LPA:1$smdp.address$TEST12345678" class="btn btn-install">
-        測試 A：直接觸發 LPA 安裝
-    </a>
+        <button onclick="smartInstall('smdp.address', 'TEST123456')" class="btn btn-primary">
+            🚀 一鍵嘗試自動安裝
+        </button>
 
-    <button onclick="handleInstall()" class="btn btn-copy">
-        測試 B：JS 觸發跳轉
-    </button>
+        <p style="font-size: 13px; color: #888;">若點擊後顯示「網址無效」，請參考下方指引</p>
 
-    <div class="info">
-        <p>測試 A 若成功，iPhone 會彈出「加入行動方案」視窗。</p>
-        <p>測試 B 會嘗試複製代碼後並跳轉。</p>
+        <div id="manual-guide" class="guide">
+            <strong>💡 手動安裝指引：</strong><br>
+            1. 已為您自動複製代碼。<br>
+            2. 請前往 <b>設定 > 行動服務</b>。<br>
+            3. 點選 <b>加入 eSIM > 使用 QR 碼</b>。<br>
+            4. 點選下方的 <b>手動輸入詳細資訊</b> 並貼上。
+        </div>
     </div>
 
     <script>
-        function handleInstall() {
-            // 模擬複製代碼到剪貼簿
-            const code = "LPA:1$smdp.address$TEST12345678";
-            navigator.clipboard.writeText(code).then(() => {
-                alert("已自動複製代碼，即將跳轉設定頁面...");
-                // 嘗試跳轉設定頁面（iOS 特定路徑）
-                window.location.href = "LPA:1$smdp.address$TEST12345678";
-            });
+        async function smartInstall(smdp, code) {
+            const fullLpa = `LPA:1$${smdp}$${code}`;
+            
+            try {
+                // 1. 執行自動複製 (HTTPS 下才有效)
+                await navigator.clipboard.writeText(fullLpa);
+                alert("✅ 安裝代碼已自動複製！\n即將嘗試開啟系統安裝視窗...");
+
+                // 2. 顯示引導區塊 (預防跳轉失敗)
+                document.getElementById('manual-guide').style.display = 'block';
+
+                // 3. 嘗試跳轉
+                window.location.href = fullLpa;
+
+            } catch (err) {
+                alert("複製失敗，請手動長按代碼複製。");
+            }
         }
     </script>
-
 </body>
 </html>
