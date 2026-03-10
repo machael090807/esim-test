@@ -3,52 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2eSIM 單機安裝測試</title>
+    <title>2eSIM 單機安裝實測</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; background: #f0f2f5; color: #333; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 350px; margin: auto; }
-        .qr-container { background: #fff; padding: 10px; border: 2px dashed #007AFF; border-radius: 15px; margin: 20px 0; position: relative; }
+        /* 採用 iOS 風格簡約設計，符合品牌質感 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; text-align: center; background: #f2f2f7; color: #1c1c1e; }
+        .card { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); max-width: 360px; margin: 20px auto; }
+        .qr-section { background: #fff; padding: 15px; border: 2px solid #007AFF; border-radius: 18px; margin-bottom: 20px; }
         .qr-image { width: 100%; border-radius: 10px; display: block; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; transition: 0.2s; }
-        .btn-save { background-color: #007AFF; }
-        .btn-save:active { background-color: #0056b3; }
-        .guide { display: none; text-align: left; background: #eef7ff; padding: 15px; border-radius: 12px; margin-top: 20px; font-size: 14px; line-height: 1.5; border-left: 5px solid #007AFF; }
-        .badge { background: #ff3b30; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; vertical-align: middle; }
+        .btn { display: block; width: 100%; padding: 16px; margin: 12px 0; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; color: white; transition: 0.2s; }
+        .btn-blue { background-color: #007AFF; }
+        .btn-green { background-color: #34C759; }
+        .btn:active { opacity: 0.7; transform: scale(0.98); }
+        .guide-box { display: none; text-align: left; background: #f0f7ff; padding: 18px; border-radius: 15px; margin-top: 20px; font-size: 14px; line-height: 1.6; border-left: 6px solid #007AFF; }
+        h2 { margin-top: 0; color: #000; }
+        .step-tag { background: #007AFF; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-right: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h3>2eSIM 安裝導引 <span class="badge">單機專用</span></h3>
-    <p style="font-size: 14px; color: #666;">解決無法掃描自身螢幕的痛點</p>
+    <h2>2eSIM 安裝導引</h2>
+    <p style="color: #8e8e93; font-size: 14px;">解決單機無法掃描螢幕 QR Code 痛點</p>
     
-    <div class="qr-container">
-        <img src="https://raw.githubusercontent.com/machael090807/esim-test/main/2026-03-10%2017.43.13.jpg" alt="eSIM QR Code" class="qr-image">
+    <div class="qr-section">
+        <img src="2026-03-10 17.43.13.jpg" alt="eSIM QR Code" class="qr-image" id="targetQR">
     </div>
 
-    <button onclick="showGuide()" class="btn btn-save">📸 1. 長按圖片儲存至相簿</button>
-    <button onclick="copyLpa()" class="btn btn-save" style="background-color: #34C759;">📋 2. 複製手動安裝碼</button>
+    <button onclick="startGuide()" class="btn btn-blue">📸 1. 長按圖片儲存至相簿</button>
+    <button onclick="copyLPA()" class="btn btn-green">📋 2. 複製手動安裝代碼</button>
 
-    <div id="step-guide" class="guide">
-        <strong>✅ 儲存後，請依照以下路徑：</strong><br>
-        1. 進入 <b>設定</b> > <b>行動服務</b>。<br>
-        2. 點選 <b>加入 eSIM</b>。<br>
-        3. 點選 <b>使用 QR 碼</b>。<br>
-        4. 點選下方的 <b>「開啟照片」</b>，選擇剛才那張南韓網卡圖片。
+    <div id="ios-instruction" class="guide-box">
+        <strong style="font-size: 16px;">✅ 儲存成功！請執行以下步驟：</strong><hr style="border: 0.5px solid #d1d1d6; margin: 10px 0;">
+        <p><span class="step-tag">Step 1</span> 前往 <b>手機設定</b> > <b>行動服務</b></p>
+        <p><span class="step-tag">Step 2</span> 點選 <b>加入 eSIM</b></p>
+        <p><span class="step-tag">Step 3</span> 點選 <b>使用 QR 碼</b></p>
+        <p><span class="step-tag">Step 4</span> 點選下方的 <b>「開啟照片」</b>，選擇剛才存下的圖片即可自動辨識。</p>
     </div>
 </div>
 
 <script>
-    function showGuide() {
-        alert("請直接「長按」上方的 QR Code 圖片，並選擇「儲存影像」。\n儲存後，請參考下方步驟完成安裝。");
-        document.getElementById('step-guide').style.display = 'block';
+    function startGuide() {
+        alert("請長按上方的 QR Code 圖片，選擇「儲存影像」到手機相簿。\n\n儲存後，下方將開啟單機安裝步驟說明。");
+        document.getElementById('ios-instruction').style.display = 'block';
     }
 
-    function copyLpa() {
-        // 模擬從 QR Code 解析出的 LPA 字串
-        const lpaCode = "LPA:1$smdp.address$TEST123456789";
-        navigator.clipboard.writeText(lpaCode).then(() => {
-            alert("✅ 安裝代碼已複製！\n若相簿導入失敗，請在安裝畫面選擇「手動輸入」並貼上。");
+    function copyLPA() {
+        // 模擬從 QR Code 解析出的代碼
+        const lpaData = "LPA:1$smdp.address$8985207220081270553";
+        navigator.clipboard.writeText(lpaData).then(() => {
+            alert("✅ 代碼已複製到剪貼簿！\n\n若相簿導入功能不支援，請在安裝畫面點選「手動輸入詳細資訊」並貼上。");
         });
     }
 </script>
