@@ -3,56 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2eSIM 極速安裝測試</title>
+    <title>2eSIM 系統跳轉測試</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; transition: 0.3s; }
-        .btn-primary { background-color: #007AFF; }
-        .btn-copy { background-color: #34C759; }
-        .guide { display: none; text-align: left; background: #fff3cd; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #ffeeba; }
-        h2 { color: #333; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; line-height: 1.6; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; }
+        .btn-blue { background-color: #007AFF; }
+        .btn-orange { background-color: #FF9500; }
+        .btn-green { background-color: #34C759; }
+        .note { font-size: 13px; color: #666; background: #eee; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>2eSIM 安裝優化測試</h2>
-        <p>解決單機無法掃描 QR Code 的問題</p>
+    <h2>2eSIM 系統跳轉實測</h2>
+    
+    <a href="App-prefs:MOBILE_DATA_SETTINGS_ID" class="btn btn-blue">
+        試試 1：跳轉至行動服務 (prefs)
+    </a>
 
-        <button onclick="smartInstall('smdp.address', 'TEST123456')" class="btn btn-primary">
-            🚀 一鍵嘗試自動安裝
-        </button>
+    <a href="https://2esim.com/setup?bytesimdata=LPA:1$smdp.address$TEST123456" class="btn btn-orange">
+        試試 2：模擬 Apple Universal Link
+    </a>
 
-        <p style="font-size: 13px; color: #888;">若點擊後顯示「網址無效」，請參考下方指引</p>
+    <button onclick="copyAndOpen()" class="btn btn-green">
+        試試 3：自動複製代碼並嘗試開啟
+    </button>
 
-        <div id="manual-guide" class="guide">
-            <strong>💡 手動安裝指引：</strong><br>
-            1. 已為您自動複製代碼。<br>
-            2. 請前往 <b>設定 > 行動服務</b>。<br>
-            3. 點選 <b>加入 eSIM > 使用 QR 碼</b>。<br>
-            4. 點選下方的 <b>手動輸入詳細資訊</b> 並貼上。
-        </div>
+    <div class="note">
+        <strong>QA 測試說明：</strong><br>
+        1. 若出現「網址無效」，代表該版本 iOS 封鎖了瀏覽器的 prefs 權限。<br>
+        2. 若試試 2 有反應，代表系統識別了 eSIM 安裝協議。
     </div>
 
     <script>
-        async function smartInstall(smdp, code) {
-            const fullLpa = `LPA:1$${smdp}$${code}`;
-            
-            try {
-                // 1. 執行自動複製 (HTTPS 下才有效)
-                await navigator.clipboard.writeText(fullLpa);
-                alert("✅ 安裝代碼已自動複製！\n即將嘗試開啟系統安裝視窗...");
-
-                // 2. 顯示引導區塊 (預防跳轉失敗)
-                document.getElementById('manual-guide').style.display = 'block';
-
-                // 3. 嘗試跳轉
-                window.location.href = fullLpa;
-
-            } catch (err) {
-                alert("複製失敗，請手動長按代碼複製。");
-            }
+        function copyAndOpen() {
+            const code = "LPA:1$smdp.address$TEST123456";
+            navigator.clipboard.writeText(code).then(() => {
+                alert("✅ 代碼已複製！請點擊確定嘗試開啟設定。");
+                // 嘗試多種跳轉路徑
+                window.location.href = "App-prefs:root=MOBILE_DATA_SETTINGS_ID";
+            });
         }
     </script>
 </body>
