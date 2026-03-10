@@ -3,47 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2eSIM 系統跳轉測試</title>
+    <title>2eSIM 單機安裝測試</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; line-height: 1.6; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 12px 0; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; }
-        .btn-blue { background-color: #007AFF; }
-        .btn-orange { background-color: #FF9500; }
-        .btn-green { background-color: #34C759; }
-        .note { font-size: 13px; color: #666; background: #eee; padding: 10px; border-radius: 8px; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; text-align: center; background: #f0f2f5; color: #333; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 350px; margin: auto; }
+        .qr-container { background: #fff; padding: 10px; border: 2px dashed #007AFF; border-radius: 15px; margin: 20px 0; position: relative; }
+        .qr-image { width: 100%; border-radius: 10px; display: block; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; color: white; transition: 0.2s; }
+        .btn-save { background-color: #007AFF; }
+        .btn-save:active { background-color: #0056b3; }
+        .guide { display: none; text-align: left; background: #eef7ff; padding: 15px; border-radius: 12px; margin-top: 20px; font-size: 14px; line-height: 1.5; border-left: 5px solid #007AFF; }
+        .badge { background: #ff3b30; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; vertical-align: middle; }
     </style>
 </head>
 <body>
 
-    <h2>2eSIM 系統跳轉實測</h2>
+<div class="card">
+    <h3>2eSIM 安裝導引 <span class="badge">單機專用</span></h3>
+    <p style="font-size: 14px; color: #666;">解決無法掃描自身螢幕的痛點</p>
     
-    <a href="App-prefs:MOBILE_DATA_SETTINGS_ID" class="btn btn-blue">
-        試試 1：跳轉至行動服務 (prefs)
-    </a>
-
-    <a href="https://2esim.com/setup?bytesimdata=LPA:1$smdp.address$TEST123456" class="btn btn-orange">
-        試試 2：模擬 Apple Universal Link
-    </a>
-
-    <button onclick="copyAndOpen()" class="btn btn-green">
-        試試 3：自動複製代碼並嘗試開啟
-    </button>
-
-    <div class="note">
-        <strong>QA 測試說明：</strong><br>
-        1. 若出現「網址無效」，代表該版本 iOS 封鎖了瀏覽器的 prefs 權限。<br>
-        2. 若試試 2 有反應，代表系統識別了 eSIM 安裝協議。
+    <div class="qr-container">
+        <img src="https://raw.githubusercontent.com/machael090807/esim-test/main/2026-03-10%2017.43.13.jpg" alt="eSIM QR Code" class="qr-image">
     </div>
 
-    <script>
-        function copyAndOpen() {
-            const code = "LPA:1$smdp.address$TEST123456";
-            navigator.clipboard.writeText(code).then(() => {
-                alert("✅ 代碼已複製！請點擊確定嘗試開啟設定。");
-                // 嘗試多種跳轉路徑
-                window.location.href = "App-prefs:root=MOBILE_DATA_SETTINGS_ID";
-            });
-        }
-    </script>
+    <button onclick="showGuide()" class="btn btn-save">📸 1. 長按圖片儲存至相簿</button>
+    <button onclick="copyLpa()" class="btn btn-save" style="background-color: #34C759;">📋 2. 複製手動安裝碼</button>
+
+    <div id="step-guide" class="guide">
+        <strong>✅ 儲存後，請依照以下路徑：</strong><br>
+        1. 進入 <b>設定</b> > <b>行動服務</b>。<br>
+        2. 點選 <b>加入 eSIM</b>。<br>
+        3. 點選 <b>使用 QR 碼</b>。<br>
+        4. 點選下方的 <b>「開啟照片」</b>，選擇剛才那張南韓網卡圖片。
+    </div>
+</div>
+
+<script>
+    function showGuide() {
+        alert("請直接「長按」上方的 QR Code 圖片，並選擇「儲存影像」。\n儲存後，請參考下方步驟完成安裝。");
+        document.getElementById('step-guide').style.display = 'block';
+    }
+
+    function copyLpa() {
+        // 模擬從 QR Code 解析出的 LPA 字串
+        const lpaCode = "LPA:1$smdp.address$TEST123456789";
+        navigator.clipboard.writeText(lpaCode).then(() => {
+            alert("✅ 安裝代碼已複製！\n若相簿導入失敗，請在安裝畫面選擇「手動輸入」並貼上。");
+        });
+    }
+</script>
+
 </body>
 </html>
