@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2eSIM 一鍵安裝測試</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; text-decoration: none; color: white; }
+        .btn-install { background-color: #007AFF; } /* iOS 藍 */
+        .btn-copy { background-color: #34C759; } /* 綠色 */
+        .info { font-size: 12px; color: #666; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>2eSIM 技術測試頁</h2>
+    <p>請使用手機瀏覽器點擊下方按鈕</p>
+
+    <a href="LPA:1$smdp.address$TEST12345678" class="btn btn-install">
+        測試 A：直接觸發 LPA 安裝
+    </a>
+
+    <button onclick="handleInstall()" class="btn btn-copy">
+        測試 B：JS 觸發跳轉
+    </button>
+
+    <div class="info">
+        <p>測試 A 若成功，iPhone 會彈出「加入行動方案」視窗。</p>
+        <p>測試 B 會嘗試複製代碼後並跳轉。</p>
+    </div>
+
+    <script>
+        function handleInstall() {
+            // 模擬複製代碼到剪貼簿
+            const code = "LPA:1$smdp.address$TEST12345678";
+            navigator.clipboard.writeText(code).then(() => {
+                alert("已自動複製代碼，即將跳轉設定頁面...");
+                // 嘗試跳轉設定頁面（iOS 特定路徑）
+                window.location.href = "LPA:1$smdp.address$TEST12345678";
+            });
+        }
+    </script>
+
+</body>
+</html>
