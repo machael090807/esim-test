@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 我的訂單 V9.7</title>
+    <title>2eSIM 我的訂單 V9.8</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -40,7 +40,6 @@
         .tag-activated { background: #e8f4fd; color: #007AFF; border-color: #007AFF; }
         .tag-in-use { background: #e8f5e9; color: var(--green); border-color: var(--green); }
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
-        /* 新增：被退回的專屬紅色標籤 */
         .tag-rejected { background: #fff0f0; color: var(--red); border-color: var(--red); }
 
         .card-info { flex-grow: 1; } 
@@ -143,11 +142,11 @@
             </div>
             <div class="tags-container">
                 <span class="status-tag tag-active">尚未開通</span>
-                <span class="status-tag tag-rejected">被退回</span>
+                <span class="status-tag tag-rejected">退回</span>
             </div>
             <div class="card-info">
                 <h3>歐洲 - 15天</h3>
-                <p style="color: var(--red); font-weight: bold; font-size: 13px;">退回者：Amy</p>
+                <p>退回：Amy</p>
                 <p>失效時間：2026-06-20 23:59</p>
             </div>
             <div class="card-actions">
@@ -360,7 +359,7 @@
                     <span style="color:var(--red); font-size:11px; font-weight:bold;">※ 手動安裝時「確認碼」欄位請保留空白</span>
                 </div>
             </div>
-            <button class="btn-success" style="margin-top:20px;" onclick="finishActivation()">✓ 完成開通</button>
+            <button class="btn-success" onclick="finishActivation()">✓ 完成開通</button>
         </div>
     </div>
 
@@ -514,7 +513,11 @@
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
             let fromHtml = '';
-            cardInfo.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回者')) fromHtml = `<p>${p.innerText}</p>`; });
+            
+            // 確保來自和退回標示都被保留
+            cardInfo.querySelectorAll('p').forEach(p => { 
+                if(p.innerText.includes('來自') || p.innerText.includes('退回')) fromHtml = `<p>${p.innerText}</p>`; 
+            });
             
             const futureTime = getFutureTime(10); 
 
@@ -570,7 +573,11 @@
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
             let fromHtml = '';
-            cardInfo.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回者')) fromHtml = `<p>${p.innerText}</p>`; });
+            
+            // 確保來自和退回標示都被保留
+            cardInfo.querySelectorAll('p').forEach(p => { 
+                if(p.innerText.includes('來自') || p.innerText.includes('退回')) fromHtml = `<p>${p.innerText}</p>`; 
+            });
 
             cardInfo.innerHTML = `
                 ${titleHtml}
