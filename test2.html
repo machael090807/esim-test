@@ -3,53 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2eSIM My eSIM V3</title>
+    <title>2eSIM My eSIM V5</title>
     <style>
-        :root { --primary-color: #f2ba49; --bg-color: #f2f2f7; --red-color: #ff3b30; --green-color: #34C759; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; }
-        
-        /* 頂部切換標籤 */
-        .tabs { display: flex; background: #e5e5ea; border-radius: 10px; margin: 15px; padding: 2px; }
-        .tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 8px; color: #8e8e93; transition: 0.3s; }
-        .tab.active { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold; color: #000; }
-
-        /* 卡片設計 */
+        :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; overflow-x: hidden; }
+        .tabs { display: flex; background: #e5e5ea; border-radius: 12px; margin: 15px; padding: 3px; position: sticky; top: 10px; z-index: 100; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; }
+        .tab.active { background: var(--brand-blue); color: #fff; font-weight: bold; }
         .esim-list { padding: 0 15px; display: none; }
         .esim-list.active { display: block; }
-        .esim-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        
-        .status-tag { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid; }
-        .tag-active { background: #fff9eb; color: var(--primary-color); border-color: var(--primary-color); }
+        .esim-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; border: 1px solid; margin-right: 5px; }
+        .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
-        .tag-transfer { background: #e8f2ff; color: #007AFF; border-color: #007AFF; }
-
+        .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
         .card-info h3 { margin: 5px 0; font-size: 17px; }
-        .card-info p { margin: 3px 0; font-size: 13px; color: #8e8e93; }
-        .time-highlight { font-weight: bold; margin-top: 5px; }
-
-        .btn-group { margin-top: 15px; }
-        .btn-open { background: var(--primary-color); color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-cancel-transfer { background: #fff; color: var(--red-color); border: 1px solid var(--red-color); width: 100%; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* 彈窗樣式 */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-overlay.show { display: flex; }
-        .modal { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; }
-        .modal-icon { width: 40px; height: 40px; background: #fff; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--primary-color); font-size: 24px; font-weight: bold; }
-        .modal h2 { font-size: 18px; margin-bottom: 15px; }
-        .modal ul { text-align: left; font-size: 13px; color: #333; padding-left: 20px; margin-bottom: 25px; line-height: 1.8; }
-        .btn-continue { background: var(--primary-color); color: #000; border: none; width: 100%; padding: 14px; border-radius: 30px; font-weight: bold; margin-bottom: 10px; cursor: pointer; }
-        .btn-close-modal { background: none; border: none; color: #8e8e93; width: 100%; padding: 10px; cursor: pointer; }
-
-        /* 安裝頁面 */
-        #install-guide { display: none; padding: 0 15px 50px; }
-        .qr-section { margin: 20px 0; border: 2px dashed var(--primary-color); padding: 10px; border-radius: 10px; text-align: center; }
-        .qr-image { width: 100%; border-radius: 8px; display: block; }
+        .card-info p { margin: 4px 0; font-size: 13px; color: #8e8e93; }
+        .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .btn-sub { background: #fff; color: var(--brand-blue); border: 1px solid var(--brand-blue); width: 100%; padding: 10px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .btn-outline-red { background: #fff; color: var(--red); border: 1px solid var(--red); width: 100%; padding: 10px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        
+        /* 彈窗 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal { background: white; width: 100%; max-width: 320px; border-radius: 25px; padding: 25px; text-align: center; }
+        .modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <h2 style="padding: 20px 20px 5px;">My eSIM</h2>
+    <h2 style="padding: 20px;">My eSIM</h2>
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab(0)">有效</div>
@@ -58,120 +40,130 @@
     </div>
 
     <div class="esim-list active" id="list-0">
-        <div class="esim-card">
+        <div class="esim-card" id="card-my-skt">
             <span class="status-tag tag-active">尚未開通</span>
             <div class="card-info">
-                <h3>南韓 - 7天不限量 MAX Plus</h3>
-                <p>流量：不限流量 (每日 2GB 後降速)</p>
-                <p>模式：原生漫遊 (SKT/KT)</p>
-                <p class="time-highlight" style="color: var(--red-color);">截止開通：2026-04-10 11:30</p>
+                <h3>南韓 - 7天不限量</h3>
+                <p>截止開通：2026-04-10</p>
             </div>
-            <div class="btn-group">
-                <button class="btn-open" onclick="toggleModal(true)">立即開通</button>
+            <button class="btn-main" onclick="openActiveModal()">立即開通</button>
+            <button class="btn-sub" onclick="openTransferModal()">轉移 eSIM</button>
+        </div>
+        <div class="esim-card" id="card-received-jp">
+            <span class="status-tag tag-active">尚未開通</span>
+            <span class="status-tag tag-transfer">轉移</span>
+            <div class="card-info">
+                <h3>日本 - 5天 每日1GB (來自: Kevin)</h3>
+                <p>截止開通：2026-03-30</p>
             </div>
+            <button class="btn-main" onclick="openActiveModal()">立即開通</button>
+            <button class="btn-outline-red" onclick="returnOrder('card-received-jp')">退回</button>
         </div>
     </div>
 
     <div class="esim-list" id="list-1">
         <div class="esim-card">
-            <span class="status-tag tag-expired">已過期</span>
+            <span class="status-tag tag-expired">已退回</span>
             <div class="card-info">
-                <h3>日本 - 5天 每日1GB 方案</h3>
-                <p>流量：每日 1GB 後降速</p>
-                <p>模式：Softbank 4G</p>
-                <p class="time-highlight" id="expire-time-1"></p>
+                <h3>泰國 - 10天 吃到飽</h3>
+                <p>退回時間：2026-03-11 11:00</p>
             </div>
         </div>
         <div class="esim-card">
             <span class="status-tag tag-expired">已過期</span>
+            <span class="status-tag tag-transfer">轉移</span>
             <div class="card-info">
-                <h3>泰國 - 10天 50GB 吃到飽</h3>
-                <p>流量：50GB 超量後停機</p>
-                <p>模式：TrueMove H</p>
-                <p class="time-highlight" id="expire-time-2"></p>
+                <h3>越南 - 3天 總量3GB (來自: Amy)</h3>
+                <p>過期時間：2026-03-10 23:59</p>
             </div>
         </div>
     </div>
 
     <div class="esim-list" id="list-2">
-        <div class="esim-card">
+        <div class="esim-card" id="transferring-card" style="display:none;">
             <span class="status-tag tag-transfer">轉移中</span>
             <div class="card-info">
-                <h3>新加坡/馬來西亞 - 3天 總量3GB</h3>
-                <p>目標裝置：iPhone 15 Pro (Michael)</p>
-                <p>申請時間：<span class="current-time"></span></p>
+                <h3>南韓 - 7天不限量</h3>
+                <p>接收對象：123@gmail.com</p>
             </div>
-            <div class="btn-group">
-                <button class="btn-cancel-transfer" onclick="alert('已送出取消申請')">取消轉移</button>
-            </div>
+            <button class="btn-outline-red" onclick="cancelTransfer()">取消轉移</button>
         </div>
         <div class="esim-card">
             <span class="status-tag tag-expired">已轉移</span>
             <div class="card-info">
-                <h3>香港 - 1天 快速商務方案</h3>
-                <p>已成功轉移至裝置：Pixel 8 Pro</p>
-                <p>完成時間：2026-03-01 10:00</p>
+                <h3>新加坡 - 1天</h3>
+                <p>完成時間：2026-03-01</p>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-overlay" id="transferModal">
         <div class="modal">
-            <div class="modal-icon">!</div>
-            <h2>貼心提醒</h2>
-            <ul>
-                <li>本方案有效時間將於抵達目的地國產生流量後，開始計算</li>
-                <li>eSIM開通後只能於本裝置中使用</li>
-                <li>開通 eSIM 需於網路環境下進行開通</li>
-                <li>請務必於開通有效期內開通 eSIM</li>
-            </ul>
-            <button class="btn-continue" onclick="startActivation()">繼續開通</button>
-            <button class="btn-close-modal" onclick="toggleModal(false)">取消開通</button>
+            <h3>轉移 eSIM</h3>
+            <p style="font-size:13px; color:#666;">輸入接收者的會員帳號</p>
+            <input type="email" id="transferEmail" placeholder="例如: 123@gmail.com">
+            <button class="btn-main" onclick="checkMember()">確認轉移</button>
+            <p style="margin:15px 0; font-size:12px; color:#999;">— 或 —</p>
+            <button class="btn-sub" onclick="shareLink()">使用連結分享</button>
+            <button class="btn-cancel-text" onclick="closeModal('transferModal')" style="border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">取消</button>
         </div>
     </div>
 
-    <div id="install-guide">
-        <div class="esim-card" style="text-align: center;">
-            <h3>安裝引導</h3>
-            <div class="qr-section"><img src="qr.jpg" class="qr-image"></div>
-            <button onclick="copy('rsp-ios.trillium.travel')" class="btn-open" style="background:var(--green-color); color:white; margin-bottom:10px;">複製 SM-DP+ 位址</button>
-            <button onclick="copy('8985207220081270553')" class="btn-open" style="background:var(--green-color); color:white;">複製 啟用碼</button>
-            <button onclick="location.reload()" class="btn-close-modal" style="margin-top:20px;">← 返回清單</button>
+    <div class="modal-overlay" id="nonMemberModal">
+        <div class="modal">
+            <h3 style="color:var(--red);">帳號非會員</h3>
+            <p style="font-size:14px;">該帳號尚未註冊 2eSIM。<br>請分享快速註冊連結給對方，完成後將立即轉移。</p>
+            <button class="btn-main" onclick="shareLink()">複製快速註冊連結</button>
+            <button class="btn-cancel-text" onclick="closeModal('nonMemberModal')" style="border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">關閉</button>
         </div>
     </div>
 
     <script>
-        // 自動生成當前時間
-        const now = new Date();
-        const formattedTime = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        function switchTab(idx) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+            document.querySelectorAll('.esim-list').forEach((l, i) => l.classList.toggle('active', i === idx));
+        }
+
+        function openTransferModal() { document.getElementById('transferModal').style.display = 'flex'; }
         
-        document.getElementById('expire-time-1').innerText = "失效時間：" + formattedTime;
-        document.getElementById('expire-time-2').innerText = "失效時間：" + formattedTime;
-        document.querySelectorAll('.current-time').forEach(el => el.innerText = formattedTime);
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        function switchTab(index) {
-            document.querySelectorAll('.tab').forEach((t, i) => {
-                t.classList.toggle('active', i === index);
-            });
-            document.querySelectorAll('.esim-list').forEach((l, i) => {
-                l.classList.toggle('active', i === index);
-            });
-            document.getElementById('install-guide').style.display = 'none';
+        function checkMember() {
+            const email = document.getElementById('transferEmail').value;
+            if (email === "123@gmail.com") {
+                alert("驗證成功！正在轉移...");
+                document.getElementById('card-my-skt').style.display = 'none';
+                document.getElementById('transferring-card').style.display = 'block';
+                closeModal('transferModal');
+                switchTab(2); // 移動到轉移標籤
+            } else {
+                closeModal('transferModal');
+                document.getElementById('nonMemberModal').style.display = 'flex';
+            }
         }
 
-        function toggleModal(show) {
-            document.getElementById('modalOverlay').classList.toggle('show', show);
+        function shareLink() {
+            alert("已複製連結：https://2esim.com/quick-register\n(對方點擊後將進入快速註冊頁面)");
+            closeModal('nonMemberModal');
         }
 
-        function startActivation() {
-            toggleModal(false);
-            document.querySelectorAll('.esim-list, .tabs').forEach(el => el.style.display = 'none');
-            document.getElementById('install-guide').style.display = 'block';
+        function cancelTransfer() {
+            if(confirm("確定取消轉移？訂單將回到有效分類。")) {
+                document.getElementById('transferring-card').style.display = 'none';
+                document.getElementById('card-my-skt').style.display = 'block';
+                switchTab(0);
+            }
         }
 
-        function copy(text) {
-            navigator.clipboard.writeText(text).then(() => alert("✅ 已複製到剪貼簿"));
+        function returnOrder(id) {
+            if(confirm("確定退回此訂單給原轉移者？")) {
+                document.getElementById(id).style.display = 'none';
+                alert("已成功退回，請至失效分類查看。");
+                // 這裡模擬將資料移至失效
+            }
         }
+
+        function openActiveModal() { alert("啟動安裝引導流程..."); }
     </script>
 </body>
 </html>
