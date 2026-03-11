@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V5.8</title>
+    <title>2eSIM My eSIM V5.9</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; }
@@ -35,7 +35,6 @@
         .modal input { width: 100%; padding: 14px; margin: 15px 0; border: 1.5px solid var(--brand-blue); border-radius: 12px; box-sizing: border-box; text-align: center; font-size: 16px; }
 
         #install-guide { display: none; padding: 0 15px 50px; }
-        /* 圖片縮小優化 */
         .qr-section { margin: 15px auto; border: 2px dashed var(--brand-blue); padding: 10px; border-radius: 15px; text-align: center; background: #fff; width: 70%; }
         .qr-image { width: 100%; border-radius: 8px; display: block; }
         .instruction-card { background: #f9fdff; border: 1px solid #dcecf2; border-radius: 15px; padding: 15px; margin-top: 15px; text-align: left; }
@@ -66,26 +65,25 @@
             <button class="btn-main" onclick="openReminderModal('card-active-1', '南韓 - 7天不限量')">立即開通</button>
             <button class="btn-sub-small" style="width:100%; margin-top:10px;" onclick="openTransferModal('card-active-1', '南韓 - 7天')">轉移 eSIM</button>
         </div>
-        <div class="esim-card" id="card-active-2">
+        
+        <div class="esim-card" id="card-received-kevin">
             <span class="status-tag tag-active">尚未開通</span>
             <span class="status-tag tag-transfer">轉移</span>
             <div class="card-info">
                 <h3>日本 - 5天 (來自: Kevin)</h3>
                 <p>截止開通：2026-03-30 18:00</p>
             </div>
-            <button class="btn-main" onclick="openReminderModal('card-active-2', '日本 - 5天')">立即開通</button>
+            <button class="btn-main" onclick="openReminderModal('card-received-kevin', '日本 - 5天')">立即開通</button>
             <div class="btn-group-row">
-                <button class="btn-sub-small" onclick="openTransferModal('card-active-2', '日本 - 5天')">轉移</button>
-                <button class="btn-red-small" onclick="returnOrder('card-active-2', '日本 - 5天')">退回</button>
+                <button class="btn-sub-small" onclick="openTransferModal('card-received-kevin', '日本 - 5天 (來自: Kevin)')">轉移</button>
+                <button class="btn-red-small" onclick="returnOrder('card-received-kevin', '日本 - 5天 (來自: Kevin)')">退回</button>
             </div>
         </div>
     </div>
 
     <div class="esim-list" id="list-1">
-        <div class="esim-card" id="card-returned-box" style="display:none;">
-            <span class="status-tag tag-expired">已退回</span>
-            <div class="card-info"><h3 id="returned-name"></h3><p>退回時間：<span class="current-time"></span></p></div>
-        </div>
+        <div id="dynamic-returned-container"></div>
+        
         <div class="esim-card">
             <span class="status-tag tag-expired">已過期</span>
             <div class="card-info"><h3>泰國 - 10天 50GB</h3><p>失效時間：2026-02-28 23:59</p></div>
@@ -114,7 +112,7 @@
             <h3>轉移 eSIM</h3>
             <input type="email" id="transferEmail" value="123@gmail.com">
             <button class="btn-main" onclick="confirmTransferAction()">確認轉移</button>
-            <button onclick="closeModal('transferModal')" style="border:none; background:none; color:#999; margin-top:15px;">取消</button>
+            <button onclick="closeModal('transferModal')" style="border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">取消</button>
         </div>
     </div>
 
@@ -128,7 +126,7 @@
                 <li>開通 eSIM 需於網路環境下進行開通</li>
             </ul>
             <button class="btn-main" onclick="goToInstallGuide()">繼續開通</button>
-            <button onclick="closeModal('reminderModal')" style="border:none; background:none; color:#999; margin-top:15px;">取消開通</button>
+            <button onclick="closeModal('reminderModal')" style="border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">取消開通</button>
         </div>
     </div>
 
@@ -136,7 +134,6 @@
         <div class="esim-card" style="margin-top: 10px; text-align:center;">
             <h3 id="installingName" style="color:var(--brand-blue); margin-top: 0;"></h3>
             <div class="qr-section"><img src="qr.jpg" class="qr-image"></div>
-            <p style="font-size: 13px; color: #8e8e93; margin-bottom: 15px;">請長按 QR Code 儲存至相簿</p>
             <div class="instruction-card">
                 <span style="font-size:11px; color:#8e8e93;">SM-DP+ 位址</span>
                 <button onclick="copy('rsp-ios.trillium.travel')" class="btn-copy">複製位址</button>
@@ -149,12 +146,15 @@
 
     <script>
         let currentId = ''; let currentName = '';
-        function updateTime() {
+        function getNowTime() {
             const now = new Date();
-            const formatted = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            document.querySelectorAll('.current-time').forEach(el => el.innerText = formatted);
+            return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
-        updateTime();
+
+        function updateStaticTimes() {
+            document.querySelectorAll('.current-time').forEach(el => el.innerText = getNowTime());
+        }
+        updateStaticTimes();
 
         function switchTab(idx) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
@@ -180,7 +180,7 @@
             document.getElementById(currentId).style.display = 'none';
             document.getElementById('transfer-name-display').innerText = currentName;
             document.getElementById('transferring-card').style.display = 'block';
-            closeModal('transferModal'); updateTime(); switchTab(2);
+            closeModal('transferModal'); updateStaticTimes(); switchTab(2);
         }
 
         function cancelTransfer() {
@@ -190,11 +190,26 @@
         }
 
         function returnOrder(id, name) {
-            if(confirm("確定退回？")) {
+            if(confirm(`確定退回「${name}」給原發送者？`)) {
+                // 1. 隱藏有效卡片
                 document.getElementById(id).style.display = 'none';
-                document.getElementById('returned-name').innerText = name;
-                document.getElementById('card-returned-box').style.display = 'block';
-                updateTime(); switchTab(1);
+                
+                // 2. 動態在失效清單最上方加入一筆
+                const container = document.getElementById('dynamic-returned-container');
+                const newCard = document.createElement('div');
+                newCard.className = 'esim-card';
+                newCard.innerHTML = `
+                    <span class="status-tag tag-expired">已退回</span>
+                    <span class="status-tag tag-transfer">轉移</span>
+                    <div class="card-info">
+                        <h3>${name}</h3>
+                        <p>退回時間：${getNowTime()}</p>
+                    </div>
+                `;
+                container.prepend(newCard);
+
+                // 3. 跳轉分頁
+                switchTab(1);
             }
         }
 
