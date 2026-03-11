@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V8.1</title>
+    <title>2eSIM My eSIM V8.2</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -39,13 +39,15 @@
         
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
-        .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        .btn-success { background: var(--green); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); }
+        /* == 統一按鈕字體大小為 14px == */
+        .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-success { background: var(--green); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); font-size: 14px; }
+        .btn-yellow { background: var(--status-yellow); color: #1c1c1e; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
 
         .btn-group-row { display: flex; gap: 10px; }
         .btn-sub-small { flex: 1; background: #fff; color: var(--brand-blue); border: 1px solid var(--brand-blue); padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
         .btn-red-small { flex: 1; background: #fff; color: var(--red); border: 1px solid var(--red); padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
-        .btn-copy { background: var(--brand-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .btn-copy { background: var(--brand-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 14px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
         .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px; text-align: center; max-height: 90vh; overflow-y: auto; }
@@ -173,6 +175,26 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="activationSuccessModal">
+        <div class="modal" style="padding: 30px 20px;">
+            <div style="width: 50px; height: 50px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: -50px auto 15px; border: 4px solid white;">
+                <span style="color: white; font-size: 24px; font-weight: bold;">✓</span>
+            </div>
+            
+            <h2 style="margin: 0 0 20px;">開通完成！</h2>
+            
+            <ul style="text-align: left; font-size: 14px; line-height: 1.8; color: #3c3c43; padding-left: 20px; margin-bottom: 25px;">
+                <li>抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</li>
+                <li>本 eSIM 只能在此裝置中使用，無法轉換裝置</li>
+                <li>可於訂單列表中查看已使用的流量，以及剩餘時間</li>
+                <li>本方案有效時間將於抵達目的地國產生流量後，開始計算</li>
+            </ul>
+            
+            <button class="btn-yellow" onclick="closeActivationSuccessModal()">我知道了</button>
+            <a href="https://www.2esim.net/installguide" target="_blank" style="display: block; margin-top: 20px; color: #1c1c1e; font-weight: bold; text-decoration: none; font-size: 14px;">如何切換 eSIM？</a>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="detailsModal">
         <div class="modal" style="text-align: left; padding: 25px 20px;">
             <button class="modal-close-icon" onclick="closeModal('detailsModal')">×</button>
@@ -180,15 +202,12 @@
                 <h3 style="margin: 0; font-size: 20px;">訂購內容</h3>
                 <span class="status-tag" id="detail-status" style="margin: 0;"></span>
             </div>
-            
             <div style="border-bottom: 1px solid #f2f2f7; padding-bottom: 15px; margin-bottom: 15px;">
                 <div class="detail-row"><span class="detail-label">訂單編號</span><span class="detail-value" id="detail-oid"></span></div>
                 <div class="detail-row"><span class="detail-label">訂單時間</span><span class="detail-value" id="detail-otime"></span></div>
             </div>
-            
             <h3 id="detail-prod-name" style="margin: 0 0 10px; font-size: 18px; color: var(--brand-blue); padding-right: 20px;"></h3>
             <div class="detail-row"><span class="detail-label">失效時間</span><span class="detail-value" id="detail-exp">2026-08-23 18:04</span></div>
-            
             <div style="margin-top: 5px; margin-bottom: 20px;">
                 <div class="detail-row"><span class="detail-label">方案國家</span><span class="detail-value" id="detail-country"></span></div>
                 <div class="detail-row"><span class="detail-label">方案類型</span><span class="detail-value">計日型</span></div>
@@ -196,13 +215,7 @@
                 <div class="detail-row"><span class="detail-label">總訂購天數</span><span class="detail-value">x1</span></div>
                 <div class="detail-row"><span class="detail-label">開通後有效天數</span><span class="detail-value" id="detail-days"></span></div>
             </div>
-
-            <details>
-                <summary>通話功能</summary>
-                <div class="details-content">
-                    <div style="font-size: 13px; color: #8e8e93; display: flex; align-items: center;"><span style="color:var(--red); margin-right:5px; font-size:16px;">⊗</span> 不支持語音通話與簡訊</div>
-                </div>
-            </details>
+            <details><summary>通話功能</summary><div class="details-content"><div style="font-size: 13px; color: #8e8e93; display: flex; align-items: center;"><span style="color:var(--red); margin-right:5px; font-size:16px;">⊗</span> 不支持語音通話與簡訊</div></div></details>
             <details>
                 <summary>付款與物流資訊</summary>
                 <div class="details-content">
@@ -216,9 +229,7 @@
             <details>
                 <summary>服務條款與政策</summary>
                 <div class="details-content">
-                    <div style="font-size: 12px; color: #8e8e93; line-height: 1.6; background: #f9f9fb; padding: 12px; border-radius: 8px;">
-                        1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。
-                    </div>
+                    <div style="font-size: 12px; color: #8e8e93; line-height: 1.6; background: #f9f9fb; padding: 12px; border-radius: 8px;">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div>
                 </div>
             </details>
             <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:20px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
@@ -234,8 +245,7 @@
             <p id="emailError" style="color:var(--red); font-size:12px; margin-top:-10px; margin-bottom:15px; display:none; text-align:left; padding-left:10px; font-weight:bold;">⚠️ 信箱格式錯誤，請重新輸入</p>
             <button class="btn-main" onclick="confirmTransferAction()">確認轉移</button>
             <div style="margin: 25px 0 15px; position: relative; text-align: center;">
-                <hr style="border: 0.5px solid #e5e5ea;">
-                <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; font-size: 12px; color: #8e8e93;">或使用其他方式</span>
+                <hr style="border: 0.5px solid #e5e5ea;"><span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; font-size: 12px; color: #8e8e93;">或使用其他方式</span>
             </div>
             <div class="btn-group-row" style="flex-direction: column; gap: 10px;">
                 <button class="btn-sub-small" onclick="copySignUpLink()">🔗 使用連結轉移</button>
@@ -334,12 +344,11 @@
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // ================= 核心修復：switchTab 切換時強制清除 inline 隱藏樣式 =================
         function switchTab(idx) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
             document.querySelectorAll('.esim-list').forEach((l, i) => {
                 l.classList.toggle('active', i === idx);
-                l.style.display = ''; // 🔥 解藥在這裡：這會清除 goToInstallGuide 加上去的隱藏屬性
+                l.style.display = ''; 
             });
             document.getElementById('install-guide').style.display = 'none';
         }
@@ -379,7 +388,7 @@
         function goToInstallGuide() {
             closeModal('reminderModal');
             document.getElementById('mainTabs').style.display = 'none';
-            document.querySelectorAll('.esim-list').forEach(l => l.style.display = 'none'); // 全部隱藏
+            document.querySelectorAll('.esim-list').forEach(l => l.style.display = 'none'); 
             document.getElementById('pageTitle').style.display = 'none';
             document.getElementById('navHeader').style.display = 'flex';
             document.getElementById('installingName').innerText = currentName;
@@ -387,7 +396,7 @@
             window.scrollTo(0,0);
         }
 
-        // 完成開通邏輯
+        // ================= 核心更新：完成開通流程與文案對齊 =================
         function finishActivation() {
             const card = document.getElementById(currentId);
             if (!card) return;
@@ -396,7 +405,7 @@
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = '<span class="status-tag tag-activated">開通完成</span>';
 
-            // 2. 更新卡片詳細資訊內容
+            // 2. 更新卡片詳細資訊內容 (將「首次使用後顯示」緊貼在「流量有效期限」旁邊)
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
             
@@ -410,14 +419,14 @@
             cardInfo.innerHTML = `
                 ${titleHtml}
                 ${fromHtml}
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; font-size:13px; color:#8e8e93;">
+                <div style="margin-top:15px; font-size:13px; color:#8e8e93; display: flex; align-items: center; gap: 8px;">
                     <span>流量有效期限</span>
                     <span style="color:#1c1c1e; font-weight:bold; font-size:14px;">首次使用後顯示</span>
                 </div>
                 <div class="activation-instruction-box">
                     <p style="margin:0 0 10px 0;">請於 <strong style="color:#1c1c1e;">${futureTime}</strong> 前使用流量。</p>
                     <p style="margin:0 0 12px 0;">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p>
-                    <a href="#" onclick="alert('跳轉至教學頁面...'); return false;" style="color:#1c1c1e; font-weight:bold; text-decoration:underline;">如何切換 eSIM？</a>
+                    <a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e; font-weight:bold; text-decoration:underline;">如何切換 eSIM？</a>
                 </div>
             `;
 
@@ -431,13 +440,18 @@
                  detailLink.setAttribute('onclick', `openDetailsModal('${currentName}', '開通完成', '依方案', '依方案')`);
             }
 
-            // 5. 畫面切換回主列表
+            // 5. 關閉安裝頁，跳出「開通完成」彈窗
             document.getElementById('install-guide').style.display = 'none';
             document.getElementById('navHeader').style.display = 'none';
+            document.getElementById('activationSuccessModal').style.display = 'flex';
+        }
+
+        // ================= 新增：關閉成功彈窗並回到主列表 =================
+        function closeActivationSuccessModal() {
+            closeModal('activationSuccessModal');
             document.getElementById('mainTabs').style.display = 'flex';
             document.getElementById('pageTitle').style.display = 'block';
-            
-            switchTab(0); // 這裡會連帶觸發解藥 l.style.display = ''
+            switchTab(0); 
             updateBadges(); 
         }
 
