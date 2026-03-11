@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 我的訂單 V9.6</title>
+    <title>2eSIM 我的訂單 V9.7</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -39,16 +39,13 @@
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
         .tag-activated { background: #e8f4fd; color: #007AFF; border-color: #007AFF; }
         .tag-in-use { background: #e8f5e9; color: var(--green); border-color: var(--green); }
-        /* 新增：待接收標籤 */
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
 
         .card-info { flex-grow: 1; } 
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
         .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        /* 新增：接收專用的藍色實心半寬按鈕 */
         .btn-main-small { flex: 1; background: var(--brand-blue); color: #fff; border: 1px solid var(--brand-blue); padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; }
-        
         .btn-success { background: var(--green); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); }
         .btn-yellow { background: var(--status-yellow); color: #1c1c1e; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
 
@@ -66,7 +63,6 @@
         .detail-label { color: #8e8e93; }
         .detail-value { font-weight: 600; text-align: right; color: #1c1c1e; }
         
-        /* 訂單編號專屬的點擊樣式 */
         .clickable-text { cursor: pointer; color: var(--brand-blue); text-decoration: underline; text-decoration-style: dashed; text-underline-offset: 3px; transition: opacity 0.2s; }
         .clickable-text:hover { opacity: 0.7; }
         .clickable-text:active { color: var(--green); }
@@ -78,8 +74,7 @@
         details[open] summary::after { content: '－'; }
         details[open] summary { border-bottom: 1px dashed #f2f2f7; margin-bottom: 10px; }
         .details-content { padding-bottom: 10px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
+        
         #install-guide { display: none; padding: 0 15px 50px; max-width: 1000px; margin: 0 auto; }
         .qr-section { margin: 5px auto 10px; border: 2px dashed var(--brand-blue); padding: 8px; border-radius: 12px; text-align: center; background: #fff; width: 55%; max-width: 200px; }
         .qr-image { width: 100%; border-radius: 8px; display: block; pointer-events: auto; }
@@ -131,7 +126,7 @@
             </div>
             <div class="card-actions" id="actions-hank">
                 <div class="btn-group-row">
-                    <button class="btn-main-small" onclick="acceptTransfer('card-pending-hank', '美國 - 10天', 'Hank')">接收</button>
+                    <button class="btn-main-small" onclick="acceptTransfer('card-pending-hank', '美國 - 10天')">接收</button>
                     <button class="btn-red-small" onclick="openConfirmModal('return', 'card-pending-hank', '美國 - 10天', null, 'Hank')">退回</button>
                 </div>
             </div>
@@ -142,6 +137,7 @@
                 <span class="detail-link" onclick="openDetailsModal('card-active-1', '南韓 - 7天不限量 MAX', '尚未開通', '南韓', '7天')">詳細資料 〉</span>
                 <button class="simulate-usage-btn" onclick="startUsingData('card-active-1', '南韓 - 7天不限量 MAX')">🚀 模擬啟用</button>
             </div>
+            
             <div class="tags-container"><span class="status-tag tag-active">尚未開通</span></div>
             <div class="card-info">
                 <h3>南韓 - 7天不限量 MAX</h3>
@@ -169,10 +165,7 @@
             </div>
             <div class="card-actions">
                 <button class="btn-main" onclick="openReminderModal('card-active-2', '日本 - 5天')">立即開通</button>
-                <div class="btn-group-row">
-                    <button class="btn-sub-small" onclick="openTransferModal('card-active-2', '日本 - 5天')">轉移</button>
-                    <button class="btn-red-small" onclick="openConfirmModal('return', 'card-active-2', '日本 - 5天', null, 'Kevin')">退回</button>
-                </div>
+                <button class="btn-sub-small" style="width:100%;" onclick="openTransferModal('card-active-2', '日本 - 5天')">轉移 eSIM</button>
             </div>
         </div>
     </div>
@@ -403,7 +396,6 @@
             return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // ================= 更新：把「待接收(Pending)」也算進紅點數量中 =================
         function updateBadges() {
             let activeCards = document.querySelectorAll('#list-0 .esim-card:not([style*="display: none"]) .tag-active, #list-0 .esim-card:not([style*="display: none"]) .tag-pending').length;
             const activeBadge = document.getElementById('active-badge');
@@ -482,38 +474,32 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // ================= 新增：接收別人的轉移訂單 =================
-        function acceptTransfer(id, name, fromName) {
+        // ================= 接收轉移的網卡 =================
+        function acceptTransfer(id, name) {
             const card = document.getElementById(id);
             if(!card) return;
 
-            // 1. 更新標籤狀態
+            // 1. 更新標籤狀態為：尚未開通、轉移
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = `
                 <span class="status-tag tag-active">尚未開通</span>
                 <span class="status-tag tag-transfer">轉移</span>
             `;
 
-            // 2. 更新按鈕區塊，變回標準的 (立即開通 / 轉移 / 退回)
+            // 2. 移除接收/退回按鈕，替換成常規的 立即開通/轉移eSIM
             const actionsContainer = card.querySelector('.card-actions');
             actionsContainer.innerHTML = `
                 <button class="btn-main" onclick="openReminderModal('${id}', '${name}')">立即開通</button>
-                <div class="btn-group-row">
-                    <button class="btn-sub-small" onclick="openTransferModal('${id}', '${name}')">轉移</button>
-                    <button class="btn-red-small" onclick="openConfirmModal('return', '${id}', '${name}', null, '${fromName}')">退回</button>
-                </div>
+                <button class="btn-sub-small" style="width:100%;" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
             `;
 
-            // 3. 更新詳細資料的連結參數
+            // 3. 更新詳細資料綁定
             const detailLink = card.querySelector('.detail-link');
             if(detailLink) {
                 detailLink.setAttribute('onclick', `openDetailsModal('${id}', '${name}', '尚未開通', '美國', '10天')`);
             }
 
-            // 更新紅點
             updateBadges();
-            
-            // 跳出成功提示
             alert("✅ 已成功接收 eSIM！現在可以隨時準備開通了。");
         }
 
@@ -701,7 +687,6 @@
         function simulateReceiptDownload() { alert("🧾 訂單收據 PDF 已開始下載！\n\n(此為展示功能)"); }
         function simulateImageDownload() { alert("📥 已為您產生專屬安裝圖片並開始下載！\n\n(實機運作時將存入相簿中)"); }
         
-        // 更新：複製成功提示，順便顯示被複製的內容
         function copyText(t) { 
             navigator.clipboard.writeText(t).then(() => alert("✅ 已複製成功！\n\n內容：" + t)); 
         }
