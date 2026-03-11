@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V6.1</title>
+    <title>2eSIM My eSIM V6.2 修復版</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -15,7 +15,6 @@
         .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; transition: 0.3s; }
         .tab.active { background: var(--brand-blue); color: #fff; font-weight: bold; }
         
-        /* 轉移數量提示紅點 */
         .badge { position: absolute; top: 5px; right: 8px; background: var(--red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; display: none; }
 
         .esim-list { padding: 0 15px; display: none; }
@@ -55,7 +54,7 @@
     <div class="tabs" id="mainTabs">
         <div class="tab active" onclick="switchTab(0)">有效</div>
         <div class="tab" onclick="switchTab(1)">失效</div>
-        <div class="tab" onclick="switchTab(2)">轉移 <span class="badge" id="transfer-badge">1</span></div>
+        <div class="tab" onclick="switchTab(2)">轉移 <span class="badge" id="transfer-badge"></span></div>
     </div>
 
     <div class="esim-list active" id="list-0">
@@ -66,7 +65,7 @@
                 <p>截止開通：2026-04-15 23:59</p>
             </div>
             <button class="btn-main" onclick="openReminderModal('card-active-1', '南韓 - 7天不限量')">立即開通</button>
-            <button class="btn-sub-small" style="width:100%; margin-top:10px;" onclick="openTransferModal('card-active-1', '南韓 - 7天不限量')">轉移 eSIM</button>
+            <button class="btn-sub-small" style="width:100%; margin-top:10px;" onclick="openTransferModal('card-active-1', '南韓 - 7天不限量 MAX')">轉移 eSIM</button>
         </div>
         <div class="esim-card" id="card-active-2">
             <span class="status-tag tag-active">尚未開通</span>
@@ -90,15 +89,8 @@
     </div>
 
     <div class="esim-list" id="list-2">
-        <div class="esim-card" id="transferring-card" style="display:none;">
-            <span class="status-tag tag-transfer">轉移中</span>
-            <div class="card-info">
-                <h3 id="transfer-name-display"></h3>
-                <p>對象：<span id="target-email-display"></span></p>
-                <p>申請時間：<span class="current-time"></span></p>
-            </div>
-            <button class="btn-red-small" style="width:100%; margin-top:10px;" onclick="openConfirmModal('cancelTransfer', 'transferring-card', '')">取消轉移</button>
-        </div>
+        <div id="dynamic-transfer-container"></div>
+        
         <div class="esim-card">
             <span class="status-tag tag-expired">已轉移</span>
             <div class="card-info">
@@ -163,15 +155,14 @@
     <script>
         let currentId = ''; 
         let currentName = ''; 
-        let transferCount = 0; // 控制紅點數量
+        let transferCount = 0; 
+        let targetCardToRemove = null; // 紀錄要取消的那張動態卡片
         
-        // 取得當前時間 yyyy-mm-dd hh:mm
         function getNowTime() {
             const now = new Date();
             return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // 更新紅點
         function updateBadge() {
             const badge = document.getElementById('transfer-badge');
             if(transferCount > 0) { 
@@ -182,25 +173,18 @@
             }
         }
 
-        // 關閉所有彈窗
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // 頁籤切換
         function switchTab(idx) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
             document.querySelectorAll('.esim-list').forEach((l, i) => l.classList.toggle('active', i === idx));
         }
 
-        // 1. 打開開通提醒彈窗
         function openReminderModal(id, name) { 
-            currentId = id; 
-            currentName = name; 
+            currentId = id; currentName = name; 
             document.getElementById('reminderModal').style.display = 'flex'; 
         }
 
-        // 2. 前往安裝引導頁面 (修復重點)
         function goToInstallGuide() {
             closeModal('reminderModal');
             document.getElementById('mainTabs').style.display = 'none';
@@ -213,31 +197,44 @@
             window.scrollTo(0,0);
         }
 
-        // 打開轉移輸入彈窗
         function openTransferModal(id, name) { 
-            currentId = id; 
-            currentName = name; 
+            currentId = id; currentName = name; 
             document.getElementById('transferModal').style.display = 'flex'; 
         }
 
-        // 執行轉移
+        // 完美修復多筆轉移：動態創建卡片
         function confirmTransferAction() {
-            document.getElementById(currentId).style.display = 'none'; // 隱藏有效清單卡片
-            document.getElementById('transfer-name-display').innerText = currentName;
-            document.getElementById('target-email-display').innerText = document.getElementById('transferEmail').value;
-            document.querySelectorAll('.current-time').forEach(el => el.innerText = getNowTime());
-            document.getElementById('transferring-card').style.display = 'block'; // 顯示轉移中卡片
+            const email = document.getElementById('transferEmail').value;
+            document.getElementById(currentId).style.display = 'none'; 
+            
+            const transferContainer = document.getElementById('dynamic-transfer-container');
+            const newTransferCard = document.createElement('div');
+            newTransferCard.className = 'esim-card';
+            
+            // 將取消轉移按鈕與原始的 currentId 綁定，透過 this 傳遞當前的 DOM 元素
+            newTransferCard.innerHTML = `
+                <span class="status-tag tag-transfer">轉移中</span>
+                <div class="card-info">
+                    <h3>${currentName}</h3>
+                    <p>對象：${email}</p>
+                    <p>申請時間：${getNowTime()}</p>
+                </div>
+                <button class="btn-red-small" style="width:100%; margin-top:10px;" onclick="openConfirmModal('cancelTransfer', '${currentId}', '${currentName}', this)">取消轉移</button>
+            `;
+            transferContainer.prepend(newTransferCard);
             
             transferCount++; 
             updateBadge();
             closeModal('transferModal'); 
-            switchTab(2); // 跳轉到轉移分頁
+            switchTab(2); 
         }
 
-        // 自定義確認彈窗邏輯 (退回 & 取消轉移)
-        function openConfirmModal(type, id, name) {
+        // 完美修復取消邏輯：精準移除動態卡片，並恢復對應的原始卡片
+        function openConfirmModal(type, id, name, btnElement = null) {
             currentId = id; 
             currentName = name;
+            targetCardToRemove = btnElement ? btnElement.closest('.esim-card') : null;
+
             const title = document.getElementById('confirmTitle');
             const desc = document.getElementById('confirmDesc');
             const btn = document.getElementById('confirmBtn');
@@ -246,21 +243,21 @@
                 title.innerText = "確認退回訂單";
                 desc.innerText = `您確定要將「${name}」退回給原發送者嗎？此操作不可撤回。`;
                 btn.onclick = () => { 
-                    document.getElementById(id).style.display = 'none';
+                    document.getElementById(currentId).style.display = 'none';
                     const container = document.getElementById('dynamic-returned-container');
                     const newCard = document.createElement('div');
                     newCard.className = 'esim-card';
-                    newCard.innerHTML = `<span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span><div class="card-info"><h3>${name}</h3><p>退回時間：${getNowTime()}</p></div>`;
+                    newCard.innerHTML = `<span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span><div class="card-info"><h3>${currentName}</h3><p>退回時間：${getNowTime()}</p></div>`;
                     container.prepend(newCard);
                     closeModal('confirmModal'); 
                     switchTab(1);
                 };
             } else if(type === 'cancelTransfer') {
                 title.innerText = "取消轉移申請";
-                desc.innerText = "您確定要取消目前的轉移申請嗎？訂單將回到「有效」清單中。";
+                desc.innerText = `您確定要取消「${name}」的轉移申請嗎？訂單將回到「有效」清單中。`;
                 btn.onclick = () => {
-                    document.getElementById('transferring-card').style.display = 'none';
-                    document.getElementById(currentId).style.display = 'block'; // 原本的卡片復活
+                    if(targetCardToRemove) targetCardToRemove.remove(); // 從轉移清單中抹除該卡片
+                    document.getElementById(currentId).style.display = 'block'; // 原始有效卡片復活
                     transferCount--; 
                     updateBadge();
                     closeModal('confirmModal'); 
@@ -270,10 +267,7 @@
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
-        // 複製文字功能
-        function copyText(t) { 
-            navigator.clipboard.writeText(t).then(() => alert("✅ 已複製成功")); 
-        }
+        function copyText(t) { navigator.clipboard.writeText(t).then(() => alert("✅ 已複製成功")); }
     </script>
 </body>
 </html>
