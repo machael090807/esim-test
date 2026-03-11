@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V6.3</title>
+    <title>2eSIM My eSIM V6.4</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -129,9 +129,7 @@
         <div class="modal">
             <div style="width:40px; height:40px; border:2.5px solid var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; color:var(--red); font-weight:bold; font-size:24px;">!</div>
             <h3 style="margin-top:0;">尚未成為會員</h3>
-            <p style="font-size:14px; color:#666; text-align:left; line-height:1.6;">
-                該信箱尚未註冊 2eSIM。<br>請複製專屬連結傳送給對方，對方完成註冊後即可直接接收此 eSIM！
-            </p>
+            <p style="font-size:14px; color:#666; text-align:left; line-height:1.6;">該信箱尚未註冊 2eSIM。<br>請複製專屬連結傳送給對方，對方完成註冊後即可直接接收此 eSIM！</p>
             <button class="btn-main" onclick="copySignUpLink(); closeModal('nonMemberModal');">複製專屬連結</button>
             <button class="btn-sub-small" style="border:none; color:#999; margin-top:10px; width:100%;" onclick="closeModal('nonMemberModal')">返回</button>
         </div>
@@ -142,7 +140,7 @@
             <div style="width:40px; height:40px; border:2.5px solid var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; color:var(--red); font-weight:bold; font-size:24px;">?</div>
             <h3 id="confirmTitle" style="margin-top:0;">確認操作</h3>
             <p id="confirmDesc" style="font-size:14px; color:#666;"></p>
-            <button class="btn-main" style="background:var(--red);" id="confirmBtn">確定</button>
+            <button class="btn-main" style="background:var(--red);" onclick="executeConfirmAction()">確定</button>
             <button class="btn-sub-small" style="border:none; color:#999; margin-top:10px; width:100%;" onclick="closeModal('confirmModal')">返回</button>
         </div>
     </div>
@@ -181,15 +179,15 @@
         let currentId = ''; 
         let currentName = ''; 
         let transferCount = 0; 
-        let targetCardToRemove = null;
         
-        // 取得當前時間
+        // 宣告一個全域變數來儲存「當下確認彈窗要執行的任務」
+        let pendingConfirmCallback = null; 
+        
         function getNowTime() {
             const now = new Date();
             return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // 更新紅點數量
         function updateBadge() {
             const badge = document.getElementById('transfer-badge');
             if(transferCount > 0) { badge.innerText = transferCount; badge.style.display = 'block'; } 
@@ -221,39 +219,30 @@
 
         function openTransferModal(id, name) { 
             currentId = id; currentName = name; 
-            document.getElementById('transferEmail').value = '123@gmail.com'; // 恢復預設值
+            document.getElementById('transferEmail').value = '123@gmail.com'; 
             hideEmailError();
             document.getElementById('transferModal').style.display = 'flex'; 
         }
 
-        // 隱藏錯誤提示
-        function hideEmailError() {
-            document.getElementById('emailError').style.display = 'none';
-        }
+        function hideEmailError() { document.getElementById('emailError').style.display = 'none'; }
 
-        // 核心邏輯：郵件格式驗證 & 會員判斷
         function confirmTransferAction() {
             const emailInput = document.getElementById('transferEmail').value.trim();
             const errorMsg = document.getElementById('emailError');
-            
-            // 基礎信箱格式正則表達式 Regex
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
-            // 1. 判斷是否為信箱格式
             if (!emailRegex.test(emailInput)) {
-                errorMsg.style.display = 'block';
-                return; // 終止後續動作
+                errorMsg.style.display = 'block'; return; 
             }
 
-            // 2. 判斷是否為已註冊會員 (用 123@gmail.com 模擬)
             if (emailInput === "123@gmail.com") {
-                // 是會員，執行轉移
                 document.getElementById(currentId).style.display = 'none'; 
                 
                 const transferContainer = document.getElementById('dynamic-transfer-container');
                 const newTransferCard = document.createElement('div');
                 newTransferCard.className = 'esim-card';
                 
+                // 動態生成卡片，並將原本的 ID 與 Name 直接寫入點擊事件參數中
                 newTransferCard.innerHTML = `
                     <span class="status-tag tag-transfer">轉移中</span>
                     <div class="card-info">
@@ -269,58 +258,70 @@
                 closeModal('transferModal'); 
                 switchTab(2); 
             } else {
-                // 非會員，跳出引導註冊彈窗
                 closeModal('transferModal');
                 document.getElementById('nonMemberModal').style.display = 'flex';
             }
         }
 
-        // 新增：複製註冊連結
-        function copySignUpLink() {
-            navigator.clipboard.writeText('https://www.2esim.net/signup').then(() => {
-                alert("✅ 連結已複製：\nhttps://www.2esim.net/signup");
-            });
+        // ================= 重構：穩固的確認彈窗機制 =================
+        function executeConfirmAction() {
+            if (pendingConfirmCallback) {
+                pendingConfirmCallback(); // 執行預先綁定的任務
+            }
+            closeModal('confirmModal');
         }
 
-        // 新增：模擬下載安裝圖片
-        function simulateImageDownload() {
-            alert("📥 已為您產生專屬安裝圖片並開始下載！\n\n(此為 Demo 模擬功能，實機運作時將會把整頁安裝資訊存入手機相簿中)");
-        }
-
-        // 確認彈窗邏輯
-        function openConfirmModal(type, id, name, btnElement = null) {
-            currentId = id; currentName = name;
-            targetCardToRemove = btnElement ? btnElement.closest('.esim-card') : null;
-
+        function openConfirmModal(type, originalId, originalName, btnElement = null) {
             const title = document.getElementById('confirmTitle');
             const desc = document.getElementById('confirmDesc');
-            const btn = document.getElementById('confirmBtn');
 
             if(type === 'return') {
                 title.innerText = "確認退回訂單";
-                desc.innerText = `您確定要將「${name}」退回給原發送者嗎？此操作不可撤回。`;
-                btn.onclick = () => { 
-                    document.getElementById(currentId).style.display = 'none';
+                desc.innerText = `您確定要將「${originalName}」退回給原發送者嗎？此操作不可撤回。`;
+                
+                // 註冊退回任務
+                pendingConfirmCallback = () => {
+                    const activeCard = document.getElementById(originalId);
+                    if(activeCard) activeCard.style.display = 'none'; // 隱藏有效區卡片
+                    
                     const container = document.getElementById('dynamic-returned-container');
                     const newCard = document.createElement('div');
                     newCard.className = 'esim-card';
-                    newCard.innerHTML = `<span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span><div class="card-info"><h3>${currentName}</h3><p>退回時間：${getNowTime()}</p></div>`;
+                    newCard.innerHTML = `<span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span><div class="card-info"><h3>${originalName}</h3><p>退回時間：${getNowTime()}</p></div>`;
                     container.prepend(newCard);
-                    closeModal('confirmModal'); switchTab(1);
+                    switchTab(1); // 跳轉到失效區
                 };
+
             } else if(type === 'cancelTransfer') {
                 title.innerText = "取消轉移申請";
-                desc.innerText = `您確定要取消「${name}」的轉移申請嗎？訂單將回到「有效」清單中。`;
-                btn.onclick = () => {
-                    if(targetCardToRemove) targetCardToRemove.remove(); 
-                    document.getElementById(currentId).style.display = 'block'; 
-                    transferCount--; updateBadge();
-                    closeModal('confirmModal'); switchTab(0);
+                desc.innerText = `您確定要取消「${originalName}」的轉移申請嗎？訂單將回到「有效」清單中。`;
+                
+                // 註冊取消轉移任務
+                pendingConfirmCallback = () => {
+                    // 1. 殺掉轉移中的動態卡片
+                    if(btnElement) {
+                        const cardToRemove = btnElement.closest('.esim-card');
+                        if(cardToRemove) cardToRemove.remove();
+                    }
+                    
+                    // 2. 復活原本有效區的卡片 (透過 originalId 精準打擊)
+                    const activeCard = document.getElementById(originalId);
+                    if(activeCard) activeCard.style.display = 'block'; 
+                    
+                    transferCount = Math.max(0, transferCount - 1); 
+                    updateBadge();
+                    switchTab(0); // 跳轉回有效區
                 };
             }
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
+        function copySignUpLink() {
+            navigator.clipboard.writeText('https://www.2esim.net/signup').then(() => {
+                alert("✅ 連結已複製：\nhttps://www.2esim.net/signup");
+            });
+        }
+        function simulateImageDownload() { alert("📥 已為您產生專屬安裝圖片並開始下載！\n\n(實機運作時將存入相簿中)"); }
         function copyText(t) { navigator.clipboard.writeText(t).then(() => alert("✅ 已複製成功")); }
     </script>
 </body>
