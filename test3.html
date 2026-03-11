@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V9.0</title>
+    <title>2eSIM My eSIM V9.1</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -27,6 +27,11 @@
         .esim-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
         
         .detail-link { position: absolute; top: 20px; right: 20px; font-size: 13px; color: var(--brand-blue); cursor: pointer; font-weight: bold; }
+        
+        /* 新增：懸浮於詳細資料下方的模擬按鈕 */
+        .simulate-usage-btn { position: absolute; top: 45px; right: 20px; font-size: 11px; background: #fff; color: var(--green); border: 1px solid var(--green); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(52, 199, 89, 0.1); }
+        .simulate-usage-btn:hover { background: var(--green); color: white; }
+
         .tags-container { margin-bottom: 5px; }
         
         .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; border: 1px solid; margin-right: 5px; }
@@ -34,7 +39,6 @@
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
         .tag-activated { background: #e8f4fd; color: #007AFF; border-color: #007AFF; }
-        /* 新增：使用中標籤 */
         .tag-in-use { background: #e8f5e9; color: var(--green); border-color: var(--green); }
 
         .card-info { flex-grow: 1; } 
@@ -76,7 +80,6 @@
         .instruction-card { background: #f9fdff; border: 1px solid #dcecf2; border-radius: 15px; padding: 15px; margin-top: 15px; text-align: left; }
         .activation-instruction-box { background: #f2f2f7; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13px; color: #3c3c43; line-height: 1.6; }
 
-        /* 新增：流量進度條樣式 */
         .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-top: 8px; width: 100%; overflow: hidden; }
         .progress-bar-fill { background: var(--status-yellow); height: 100%; width: 95%; border-radius: 2px; }
 
@@ -237,8 +240,6 @@
                 </div>
             </details>
             
-            <button id="btn-simulate-usage" class="btn-success" style="display:none; width: 100%; margin-top: 15px; border-radius: 10px;" onclick="startUsingData()">🚀 模擬開始使用流量</button>
-            
             <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:15px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
         </div>
     </div>
@@ -318,7 +319,7 @@
 
     <script>
         let currentId = ''; let currentName = ''; let transferCount = 0; let pendingConfirmCallback = null; 
-        let currentDetailCardId = ''; // 用來記錄當前打開詳細資料的是哪張卡片
+        let currentDetailCardId = ''; 
         
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
@@ -360,9 +361,8 @@
             document.getElementById('install-guide').style.display = 'none';
         }
 
-        // 修改：加入 id 參數，並控制「模擬使用」按鈕
         function openDetailsModal(id, title, status, country, days) {
-            currentDetailCardId = id; // 記住這張卡
+            currentDetailCardId = id; 
             currentName = title;
 
             const statusBadge = document.getElementById('detail-status');
@@ -374,13 +374,6 @@
             else if(status.includes('轉移')) statusBadge.className = 'status-tag tag-transfer';
             else statusBadge.className = 'status-tag tag-expired';
             
-            // 只有狀態是「開通完成」時，才顯示模擬開始使用的按鈕
-            if(status === '開通完成') {
-                document.getElementById('btn-simulate-usage').style.display = 'block';
-            } else {
-                document.getElementById('btn-simulate-usage').style.display = 'none';
-            }
-
             document.getElementById('detail-prod-name').innerText = title;
             document.getElementById('detail-country').innerText = country;
             document.getElementById('detail-days').innerText = days;
@@ -452,6 +445,15 @@
                  detailLink.setAttribute('onclick', `openDetailsModal('${currentId}', '${currentName}', '開通完成', '依方案', '依方案')`);
             }
 
+            // 新增：在詳細資料下方動態加入「模擬啟用」的小按鈕
+            if(!card.querySelector('.simulate-usage-btn')) {
+                const simBtn = document.createElement('span');
+                simBtn.className = 'simulate-usage-btn';
+                simBtn.innerHTML = '🚀 模擬啟用';
+                simBtn.onclick = function() { startUsingData(currentId, currentName); };
+                card.appendChild(simBtn);
+            }
+
             document.getElementById('install-guide').style.display = 'none';
             document.getElementById('navHeader').style.display = 'none';
             document.getElementById('activationSuccessModal').style.display = 'flex';
@@ -465,24 +467,25 @@
             updateBadges(); 
         }
 
-        // ================= 終極新增：模擬開始使用流量，變更為「使用中」 =================
-        function startUsingData() {
-            closeModal('detailsModal'); // 關閉詳細資料彈窗
-            
-            const card = document.getElementById(currentDetailCardId);
+        // ================= 核心更新：模擬開始使用流量，按鈕在卡片外層 =================
+        function startUsingData(cardId, cardName) {
+            const card = document.getElementById(cardId);
             if (!card) return;
 
-            // 1. 變更標籤為綠色「使用中」
+            // 1. 移除右上角的模擬小按鈕
+            const simBtn = card.querySelector('.simulate-usage-btn');
+            if (simBtn) simBtn.remove();
+
+            // 2. 變更標籤為綠色「使用中」
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = '<span class="status-tag tag-in-use">使用中</span>';
 
-            // 2. 獲取基本資訊
+            // 3. 獲取基本資訊並套用進度條版型
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
             let fromHtml = '';
             cardInfo.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自')) fromHtml = `<p>${p.innerText}</p>`; });
 
-            // 3. 渲染成截圖的進度條版型
             cardInfo.innerHTML = `
                 ${titleHtml}
                 ${fromHtml}
@@ -503,14 +506,13 @@
                 </div>
             `;
 
-            // 4. 更新詳細資料的連結參數，讓它下次打開時狀態顯示為「使用中」
+            // 4. 更新詳細資料的連結參數
             const detailLink = card.querySelector('.detail-link');
             if(detailLink) {
-                 detailLink.setAttribute('onclick', `openDetailsModal('${currentDetailCardId}', '${currentName}', '使用中', '依方案', '依方案')`);
+                 detailLink.setAttribute('onclick', `openDetailsModal('${cardId}', '${cardName}', '使用中', '依方案', '依方案')`);
             }
         }
 
-        // 轉移與其他相關邏輯
         function openTransferModal(id, name) { 
             currentId = id; currentName = name; 
             document.getElementById('transferEmail').value = '123@gmail.com'; 
@@ -528,8 +530,6 @@
             if (emailInput === "123@gmail.com") {
                 document.getElementById(currentId).style.display = 'none'; 
                 const transferContainer = document.getElementById('dynamic-transfer-container');
-                
-                // 生成一組動態 ID 賦予新卡片，確保可以被精準抓取
                 const dynId = 'dyn-transfer-' + Date.now();
                 const newTransferCard = document.createElement('div');
                 newTransferCard.className = 'esim-card';
@@ -564,10 +564,8 @@
                     const activeCard = document.getElementById(originalId);
                     if(activeCard) activeCard.style.display = 'none'; 
                     const container = document.getElementById('dynamic-returned-container');
-                    
                     const dynId = 'dyn-returned-' + Date.now();
                     const newCard = document.createElement('div'); newCard.className = 'esim-card'; newCard.id = dynId;
-                    
                     const fromHtml = fromName ? `<p>來自：${fromName}</p>` : '';
                     newCard.innerHTML = `
                         <span class="detail-link" onclick="openDetailsModal('${dynId}', '${originalName}', '已退回', '依方案', '依方案')">詳細資料 〉</span>
