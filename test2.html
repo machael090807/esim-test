@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2eSIM My eSIM V2</title>
+    <style>
+        :root { --primary-color: #f2ba49; --bg-color: #f2f2f7; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; }
+        
+        /* 頂部切換標籤 */
+        .tabs { display: flex; background: #e5e5ea; border-radius: 10px; margin: 15px; padding: 2px; }
+        .tab { flex: 1; padding: 10px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 8px; }
+        .tab.active { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold; }
+
+        /* 卡片設計 */
+        .esim-list { padding: 0 15px; }
+        .esim-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .status-tag { display: inline-block; background: #fff9eb; color: #f2ba49; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid #f2ba49; }
+        .card-info h3 { margin: 5px 0; font-size: 18px; }
+        .card-info p { margin: 3px 0; font-size: 14px; color: #8e8e93; }
+        .btn-open { background: var(--primary-color); color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+
+        /* 貼心提醒彈窗 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; }
+        .modal-icon { width: 40px; height: 40px; background: #fff; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--primary-color); font-size: 24px; font-weight: bold; }
+        .modal h2 { font-size: 18px; margin-bottom: 15px; }
+        .modal ul { text-align: left; font-size: 13px; color: #333; padding-left: 20px; margin-bottom: 25px; line-height: 1.8; }
+        .btn-continue { background: var(--primary-color); color: #000; border: none; width: 100%; padding: 14px; border-radius: 30px; font-weight: bold; margin-bottom: 10px; cursor: pointer; }
+        .btn-cancel { background: none; border: none; color: #8e8e93; width: 100%; padding: 10px; cursor: pointer; }
+
+        /* 安裝引導頁面 */
+        #install-guide { display: none; padding-bottom: 50px; }
+        .qr-section { margin: 20px 0; border: 2px dashed var(--primary-color); padding: 10px; border-radius: 10px; }
+        .qr-image { width: 100%; border-radius: 8px; display: block; }
+        .copy-group { background: #f9f9fb; padding: 15px; border-radius: 15px; border: 1px solid #d1d1d6; margin-top: 20px; text-align: left; }
+        .field-label { font-size: 11px; color: #8e8e93; margin-top: 10px; display: block; }
+        .btn-copy { background: #34C759; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h2 style="padding: 20px 20px 5px;">My eSIM</h2>
+
+    <div class="tabs">
+        <div class="tab active">有效</div>
+        <div class="tab">失效</div>
+    </div>
+
+    <div class="esim-list" id="card-list">
+        <div class="esim-card">
+            <span class="status-tag">尚未開通</span>
+            <div class="card-info">
+                <h3>南韓 - 7天不限量 MAX Plus</h3>
+                <p>流量：不限流量 (每日 2GB 後降速)</p>
+                <p>模式：原生漫遊 (SKT/KT)</p>
+                <p style="color: #ff3b30; font-weight: bold;">截止開通：2026-04-10 前</p>
+            </div>
+            <button class="btn-open" onclick="toggleModal(true)">立即開通</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-icon">!</div>
+            <h2>貼心提醒</h2>
+            <ul>
+                <li>本方案有效時間將於抵達目的地國產生流量後，開始計算</li>
+                <li>eSIM開通後只能於本裝置中使用</li>
+                <li>開通 eSIM 需於網路環境下進行開通</li>
+                <li>請務必於開通有效期內開通 eSIM</li>
+            </ul>
+            <button class="btn-continue" onclick="startActivation()">繼續開通</button>
+            <button class="btn-cancel" onclick="toggleModal(false)">取消開通</button>
+        </div>
+    </div>
+
+    <div class="esim-list" id="install-guide">
+        <div class="esim-card" style="text-align: center;">
+            <h3 style="margin-bottom: 20px;">安裝引導</h3>
+            <div class="qr-section">
+                <img src="qr.jpg" class="qr-image" alt="eSIM QR Code">
+            </div>
+            <p style="font-size: 13px; color: #8e8e93;">請長按 QR Code 儲存至相簿</p>
+            
+            <div class="copy-group">
+                <span class="field-label">SM-DP+ 位址</span>
+                <button onclick="copy('rsp-ios.trillium.travel')" class="btn-copy">複製位址</button>
+                <span class="field-label">啟用碼</span>
+                <button onclick="copy('8985207220081270553')" class="btn-copy">複製啟用碼</button>
+            </div>
+            <button onclick="location.reload()" class="btn-cancel" style="margin-top:20px;">← 返回清單</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleModal(show) {
+            const overlay = document.getElementById('modalOverlay');
+            if(show) overlay.classList.add('show');
+            else overlay.classList.remove('show');
+        }
+
+        function startActivation() {
+            toggleModal(false);
+            document.getElementById('card-list').style.display = 'none';
+            document.querySelector('.tabs').style.display = 'none';
+            document.getElementById('install-guide').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        function copy(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("✅ 已複製到剪貼簿");
+            });
+        }
+    </script>
+</body>
+</html>
