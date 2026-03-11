@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V8.0</title>
+    <title>2eSIM My eSIM V8.1</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -33,7 +33,6 @@
         .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
-        /* 新增：開通完成標籤狀態 */
         .tag-activated { background: #e8f4fd; color: #007AFF; border-color: #007AFF; }
 
         .card-info { flex-grow: 1; } 
@@ -41,7 +40,6 @@
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
         .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; }
-        /* 新增：安裝頁面完成開通的綠色按鈕 */
         .btn-success { background: var(--green); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(52, 199, 89, 0.3); }
 
         .btn-group-row { display: flex; gap: 10px; }
@@ -74,7 +72,6 @@
         .qr-image { width: 100%; border-radius: 8px; display: block; }
         .instruction-card { background: #f9fdff; border: 1px solid #dcecf2; border-radius: 15px; padding: 15px; margin-top: 15px; text-align: left; }
 
-        /* 新增：開通完成後的灰底提示框樣式 */
         .activation-instruction-box { background: #f2f2f7; border-radius: 12px; padding: 15px; margin-top: 15px; font-size: 13px; color: #3c3c43; line-height: 1.6; }
 
         @media (min-width: 768px) {
@@ -300,7 +297,6 @@
             </div>
             
             <button class="btn-success" onclick="finishActivation()">✓ 完成開通</button>
-
         </div>
     </div>
 
@@ -318,7 +314,6 @@
             return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // 計算未來 10 天的時間
         function getFutureTime(daysToAdd) {
             const now = new Date();
             now.setDate(now.getDate() + daysToAdd);
@@ -339,9 +334,13 @@
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        // ================= 核心修復：switchTab 切換時強制清除 inline 隱藏樣式 =================
         function switchTab(idx) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-            document.querySelectorAll('.esim-list').forEach((l, i) => l.classList.toggle('active', i === idx));
+            document.querySelectorAll('.esim-list').forEach((l, i) => {
+                l.classList.toggle('active', i === idx);
+                l.style.display = ''; // 🔥 解藥在這裡：這會清除 goToInstallGuide 加上去的隱藏屬性
+            });
             document.getElementById('install-guide').style.display = 'none';
         }
 
@@ -350,7 +349,7 @@
             statusBadge.innerText = status;
             
             if(status.includes('尚未開通')) statusBadge.className = 'status-tag tag-active';
-            else if(status.includes('開通完成')) statusBadge.className = 'status-tag tag-activated'; // 支援新狀態
+            else if(status.includes('開通完成')) statusBadge.className = 'status-tag tag-activated'; 
             else if(status.includes('轉移')) statusBadge.className = 'status-tag tag-transfer';
             else statusBadge.className = 'status-tag tag-expired';
             
@@ -380,7 +379,7 @@
         function goToInstallGuide() {
             closeModal('reminderModal');
             document.getElementById('mainTabs').style.display = 'none';
-            document.getElementById('list-0').style.display = 'none';
+            document.querySelectorAll('.esim-list').forEach(l => l.style.display = 'none'); // 全部隱藏
             document.getElementById('pageTitle').style.display = 'none';
             document.getElementById('navHeader').style.display = 'flex';
             document.getElementById('installingName').innerText = currentName;
@@ -388,7 +387,7 @@
             window.scrollTo(0,0);
         }
 
-        // ================= 核心新增：完成開通並變更卡片狀態 =================
+        // 完成開通邏輯
         function finishActivation() {
             const card = document.getElementById(currentId);
             if (!card) return;
@@ -397,12 +396,16 @@
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = '<span class="status-tag tag-activated">開通完成</span>';
 
-            // 2. 更新卡片詳細資訊內容 (還原截圖設計)
+            // 2. 更新卡片詳細資訊內容
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
-            const fromTextEl = cardInfo.querySelector('p:not([class])');
-            const fromHtml = fromTextEl && fromTextEl.innerText.includes('來自') ? `<p>${fromTextEl.innerText}</p>` : '';
-            const futureTime = getFutureTime(10); // 當下時間 + 10 天
+            
+            let fromHtml = '';
+            cardInfo.querySelectorAll('p').forEach(p => {
+                if(p.innerText.includes('來自')) fromHtml = `<p>${p.innerText}</p>`;
+            });
+            
+            const futureTime = getFutureTime(10); 
 
             cardInfo.innerHTML = `
                 ${titleHtml}
@@ -434,11 +437,11 @@
             document.getElementById('mainTabs').style.display = 'flex';
             document.getElementById('pageTitle').style.display = 'block';
             
-            switchTab(0);
-            updateBadges(); // 紅點將自動減少，因為 tag-active 消失了
+            switchTab(0); // 這裡會連帶觸發解藥 l.style.display = ''
+            updateBadges(); 
         }
 
-        // 其餘保持不變
+        // 轉移與其他相關邏輯
         function openTransferModal(id, name) { 
             currentId = id; currentName = name; 
             document.getElementById('transferEmail').value = '123@gmail.com'; 
