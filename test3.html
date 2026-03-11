@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V9.1</title>
+    <title>2eSIM My eSIM V9.2</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -26,14 +26,15 @@
 
         .esim-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
         
-        .detail-link { position: absolute; top: 20px; right: 20px; font-size: 13px; color: var(--brand-blue); cursor: pointer; font-weight: bold; }
-        
-        /* 新增：懸浮於詳細資料下方的模擬按鈕 */
-        .simulate-usage-btn { position: absolute; top: 45px; right: 20px; font-size: 11px; background: #fff; color: var(--green); border: 1px solid var(--green); padding: 4px 8px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(52, 199, 89, 0.1); }
+        /* == 核心修復：右上角操作區容器，確保按鈕絕對不會跑掉 == */
+        .top-right-actions { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 10; }
+        .detail-link { font-size: 13px; color: var(--brand-blue); cursor: pointer; font-weight: bold; }
+        .simulate-usage-btn { display: none; font-size: 11px; background: #fff; color: var(--green); border: 1.5px solid var(--green); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(52, 199, 89, 0.15); animation: pulse 1.5s infinite; }
         .simulate-usage-btn:hover { background: var(--green); color: white; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         .tags-container { margin-bottom: 5px; }
-        
         .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; border: 1px solid; margin-right: 5px; }
         .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
@@ -42,7 +43,6 @@
         .tag-in-use { background: #e8f5e9; color: var(--green); border-color: var(--green); }
 
         .card-info { flex-grow: 1; } 
-        
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
         .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -56,9 +56,7 @@
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
         .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px; text-align: center; max-height: 90vh; overflow-y: auto; }
-        
         .modal-close-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #a1a1aa; background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-
         .modal input { width: 100%; padding: 14px; margin: 15px 0; border: 1.5px solid var(--brand-blue); border-radius: 12px; box-sizing: border-box; text-align: center; font-size: 16px; }
 
         .detail-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
@@ -72,8 +70,7 @@
         details[open] summary::after { content: '－'; }
         details[open] summary { border-bottom: 1px dashed #f2f2f7; margin-bottom: 10px; }
         .details-content { padding-bottom: 10px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
+        
         #install-guide { display: none; padding: 0 15px 50px; }
         .qr-section { margin: 15px auto; border: 2px dashed var(--brand-blue); padding: 10px; border-radius: 15px; text-align: center; background: #fff; width: 70%; max-width: 250px; }
         .qr-image { width: 100%; border-radius: 8px; display: block; }
@@ -88,9 +85,7 @@
             .esim-card { width: calc(50% - 7.5px); }
             #install-guide .esim-card { width: 100%; max-width: 500px; margin: 0 auto; }
         }
-        @media (min-width: 1024px) {
-            .esim-card { width: calc(33.333% - 10px); }
-        }
+        @media (min-width: 1024px) { .esim-card { width: calc(33.333% - 10px); } }
     </style>
 </head>
 <body>
@@ -111,7 +106,11 @@
 
     <div class="esim-list active" id="list-0">
         <div class="esim-card" id="card-active-1">
-            <span class="detail-link" onclick="openDetailsModal('card-active-1', '南韓 - 7天不限量 MAX', '尚未開通', '南韓', '7天')">詳細資料 〉</span>
+            <div class="top-right-actions">
+                <span class="detail-link" onclick="openDetailsModal('card-active-1', '南韓 - 7天不限量 MAX', '尚未開通', '南韓', '7天')">詳細資料 〉</span>
+                <button class="simulate-usage-btn" onclick="startUsingData('card-active-1', '南韓 - 7天不限量 MAX')">🚀 模擬啟用</button>
+            </div>
+            
             <div class="tags-container"><span class="status-tag tag-active">尚未開通</span></div>
             <div class="card-info">
                 <h3>南韓 - 7天不限量 MAX</h3>
@@ -124,7 +123,10 @@
         </div>
         
         <div class="esim-card" id="card-active-2">
-            <span class="detail-link" onclick="openDetailsModal('card-active-2', '日本 - 5天', '尚未開通', '日本', '5天')">詳細資料 〉</span>
+            <div class="top-right-actions">
+                <span class="detail-link" onclick="openDetailsModal('card-active-2', '日本 - 5天', '尚未開通', '日本', '5天')">詳細資料 〉</span>
+                <button class="simulate-usage-btn" onclick="startUsingData('card-active-2', '日本 - 5天')">🚀 模擬啟用</button>
+            </div>
             <div class="tags-container">
                 <span class="status-tag tag-active">尚未開通</span>
                 <span class="status-tag tag-transfer">轉移</span>
@@ -147,7 +149,9 @@
     <div class="esim-list" id="list-1">
         <div id="dynamic-returned-container"></div>
         <div class="esim-card">
-            <span class="detail-link" onclick="openDetailsModal('card-expired-1', '泰國 - 10天 50GB', '已過期', '泰國', '10天')">詳細資料 〉</span>
+            <div class="top-right-actions">
+                <span class="detail-link" onclick="openDetailsModal('card-expired-1', '泰國 - 10天 50GB', '已過期', '泰國', '10天')">詳細資料 〉</span>
+            </div>
             <div class="tags-container"><span class="status-tag tag-expired">已過期</span></div>
             <div class="card-info">
                 <h3>泰國 - 10天 50GB</h3>
@@ -155,7 +159,9 @@
             </div>
         </div>
         <div class="esim-card">
-            <span class="detail-link" onclick="openDetailsModal('card-expired-2', '越南 - 3天', '已過期', '越南', '3天')">詳細資料 〉</span>
+            <div class="top-right-actions">
+                <span class="detail-link" onclick="openDetailsModal('card-expired-2', '越南 - 3天', '已過期', '越南', '3天')">詳細資料 〉</span>
+            </div>
             <div class="tags-container">
                 <span class="status-tag tag-expired">已過期</span>
                 <span class="status-tag tag-transfer">轉移</span>
@@ -171,7 +177,9 @@
     <div class="esim-list" id="list-2">
         <div id="dynamic-transfer-container"></div>
         <div class="esim-card">
-            <span class="detail-link" onclick="openDetailsModal('card-transferred-1', '新加坡 - 1天 漫遊方案', '已轉移', '新加坡', '1天')">詳細資料 〉</span>
+            <div class="top-right-actions">
+                <span class="detail-link" onclick="openDetailsModal('card-transferred-1', '新加坡 - 1天 漫遊方案', '已轉移', '新加坡', '1天')">詳細資料 〉</span>
+            </div>
             <div class="tags-container"><span class="status-tag tag-expired">已轉移</span></div>
             <div class="card-info">
                 <h3>新加坡 - 1天 漫遊方案</h3>
@@ -187,16 +195,13 @@
             <div style="width: 50px; height: 50px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                 <span style="color: white; font-size: 24px; font-weight: bold;">✓</span>
             </div>
-            
             <h2 style="margin: 0 0 20px;">開通完成！</h2>
-            
             <ul style="text-align: left; font-size: 14px; line-height: 1.8; color: #3c3c43; padding-left: 20px; margin-bottom: 25px;">
                 <li>抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</li>
                 <li>本 eSIM 只能在此裝置中使用，無法轉換裝置</li>
                 <li>可於訂單列表中查看已使用的流量，以及剩餘時間</li>
                 <li>本方案有效時間將於抵達目的地國產生流量後，開始計算</li>
             </ul>
-            
             <button class="btn-yellow" onclick="closeActivationSuccessModal()">我知道了</button>
             <a href="https://www.2esim.net/installguide" target="_blank" style="display: block; margin-top: 20px; color: #1c1c1e; font-weight: bold; text-decoration: none; font-size: 14px;">如何切換 eSIM？</a>
         </div>
@@ -239,8 +244,7 @@
                     <div style="font-size: 12px; color: #8e8e93; line-height: 1.6; background: #f9f9fb; padding: 12px; border-radius: 8px;">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div>
                 </div>
             </details>
-            
-            <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:15px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
+            <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:20px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
         </div>
     </div>
 
@@ -259,7 +263,6 @@
                 <button class="btn-sub-small" onclick="copySignUpLink()">🔗 使用連結轉移</button>
                 <button class="btn-sub-small" onclick="simulateImageDownload()">🖼️ 使用圖片轉移</button>
             </div>
-            <button onclick="closeModal('transferModal')" style="border:none; background:none; color:#999; margin-top:20px; cursor:pointer;">取消</button>
         </div>
     </div>
 
@@ -297,7 +300,6 @@
                 <li>請務必於開通有效期內開通 eSIM</li>
             </ul>
             <button class="btn-main" onclick="goToInstallGuide()">繼續開通</button>
-            <button onclick="closeModal('reminderModal')" style="border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">取消開通</button>
         </div>
     </div>
 
@@ -319,7 +321,6 @@
 
     <script>
         let currentId = ''; let currentName = ''; let transferCount = 0; let pendingConfirmCallback = null; 
-        let currentDetailCardId = ''; 
         
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
@@ -362,9 +363,6 @@
         }
 
         function openDetailsModal(id, title, status, country, days) {
-            currentDetailCardId = id; 
-            currentName = title;
-
             const statusBadge = document.getElementById('detail-status');
             statusBadge.innerText = status;
             
@@ -445,14 +443,9 @@
                  detailLink.setAttribute('onclick', `openDetailsModal('${currentId}', '${currentName}', '開通完成', '依方案', '依方案')`);
             }
 
-            // 新增：在詳細資料下方動態加入「模擬啟用」的小按鈕
-            if(!card.querySelector('.simulate-usage-btn')) {
-                const simBtn = document.createElement('span');
-                simBtn.className = 'simulate-usage-btn';
-                simBtn.innerHTML = '🚀 模擬啟用';
-                simBtn.onclick = function() { startUsingData(currentId, currentName); };
-                card.appendChild(simBtn);
-            }
+            // 顯示右上角懸浮的模擬按鈕
+            const simBtn = card.querySelector('.simulate-usage-btn');
+            if (simBtn) simBtn.style.display = 'block';
 
             document.getElementById('install-guide').style.display = 'none';
             document.getElementById('navHeader').style.display = 'none';
@@ -467,20 +460,17 @@
             updateBadges(); 
         }
 
-        // ================= 核心更新：模擬開始使用流量，按鈕在卡片外層 =================
+        // 點擊後隱藏按鈕，顯示綠色進度條
         function startUsingData(cardId, cardName) {
             const card = document.getElementById(cardId);
             if (!card) return;
 
-            // 1. 移除右上角的模擬小按鈕
             const simBtn = card.querySelector('.simulate-usage-btn');
-            if (simBtn) simBtn.remove();
+            if (simBtn) simBtn.style.display = 'none';
 
-            // 2. 變更標籤為綠色「使用中」
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = '<span class="status-tag tag-in-use">使用中</span>';
 
-            // 3. 獲取基本資訊並套用進度條版型
             const cardInfo = card.querySelector('.card-info');
             const titleHtml = cardInfo.querySelector('h3').outerHTML;
             let fromHtml = '';
@@ -494,9 +484,7 @@
                 <div style="font-size: 14px; margin-bottom: 10px;">
                     <span style="color: #8e8e93;">已用流量：</span><span style="color: #1c1c1e; font-weight: bold;">0 MB</span>
                 </div>
-                
                 <hr style="border: none; border-top: 1px solid #e5e5ea; margin: 10px 0;">
-                
                 <div style="font-size: 14px; margin-bottom: 5px;">
                     <span style="color: #8e8e93;">剩餘時間：</span><span style="color: #1c1c1e; font-weight: bold;">6 天 23 小時</span>
                 </div>
@@ -506,7 +494,6 @@
                 </div>
             `;
 
-            // 4. 更新詳細資料的連結參數
             const detailLink = card.querySelector('.detail-link');
             if(detailLink) {
                  detailLink.setAttribute('onclick', `openDetailsModal('${cardId}', '${cardName}', '使用中', '依方案', '依方案')`);
@@ -536,7 +523,9 @@
                 newTransferCard.id = dynId;
                 
                 newTransferCard.innerHTML = `
-                    <span class="detail-link" onclick="openDetailsModal('${dynId}', '${currentName}', '轉移中', '依方案', '依方案')">詳細資料 〉</span>
+                    <div class="top-right-actions">
+                        <span class="detail-link" onclick="openDetailsModal('${dynId}', '${currentName}', '轉移中', '依方案', '依方案')">詳細資料 〉</span>
+                    </div>
                     <div class="tags-container"><span class="status-tag tag-transfer">轉移中</span></div>
                     <div class="card-info">
                         <h3>${currentName}</h3>
@@ -568,7 +557,9 @@
                     const newCard = document.createElement('div'); newCard.className = 'esim-card'; newCard.id = dynId;
                     const fromHtml = fromName ? `<p>來自：${fromName}</p>` : '';
                     newCard.innerHTML = `
-                        <span class="detail-link" onclick="openDetailsModal('${dynId}', '${originalName}', '已退回', '依方案', '依方案')">詳細資料 〉</span>
+                        <div class="top-right-actions">
+                            <span class="detail-link" onclick="openDetailsModal('${dynId}', '${originalName}', '已退回', '依方案', '依方案')">詳細資料 〉</span>
+                        </div>
                         <div class="tags-container"><span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span></div>
                         <div class="card-info"><h3>${originalName}</h3>${fromHtml}<p>退回時間：${getNowTime()}</p></div>
                     `;
