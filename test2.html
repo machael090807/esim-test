@@ -39,7 +39,7 @@
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
         .tag-activated { background: #e8f4fd; color: #007AFF; border-color: #007AFF; }
         .tag-in-use { background: #e8f5e9; color: var(--green); border-color: var(--green); }
-        /* 新增：待接受標籤 */
+        /* 新增：待接收標籤 */
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
 
         .card-info { flex-grow: 1; } 
@@ -118,10 +118,10 @@
         
         <div class="esim-card" id="card-pending-hank">
             <div class="top-right-actions">
-                <span class="detail-link" onclick="openDetailsModal('card-pending-hank', '美國 - 10天', '待接受', '美國', '10天')">詳細資料 〉</span>
+                <span class="detail-link" onclick="openDetailsModal('card-pending-hank', '美國 - 10天', '待接收', '美國', '10天')">詳細資料 〉</span>
             </div>
             <div class="tags-container" id="tags-hank">
-                <span class="status-tag tag-pending">待接受</span>
+                <span class="status-tag tag-pending">待接收</span>
                 <span class="status-tag tag-transfer">轉移</span>
             </div>
             <div class="card-info">
@@ -403,7 +403,7 @@
             return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
         }
 
-        // ================= 更新：把「待接受(Pending)」也算進紅點數量中 =================
+        // ================= 更新：把「待接收(Pending)」也算進紅點數量中 =================
         function updateBadges() {
             let activeCards = document.querySelectorAll('#list-0 .esim-card:not([style*="display: none"]) .tag-active, #list-0 .esim-card:not([style*="display: none"]) .tag-pending').length;
             const activeBadge = document.getElementById('active-badge');
@@ -448,7 +448,7 @@
                 statusBadge.className = 'status-tag tag-in-use'; 
                 esimInfoSection.style.display = 'block'; 
             }
-            else if(status.includes('待接受')) {
+            else if(status.includes('待接收')) {
                 statusBadge.className = 'status-tag tag-pending';
                 esimInfoSection.style.display = 'none';
             }
