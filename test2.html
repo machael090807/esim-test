@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 我的訂單 V9.7</title>
+    <title>2eSIM 我的訂單 V9.8</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -474,33 +474,30 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // ================= 接收轉移的網卡 =================
+        // ================= 無縫接收轉移網卡 (移除 alert) =================
         function acceptTransfer(id, name) {
             const card = document.getElementById(id);
             if(!card) return;
 
-            // 1. 更新標籤狀態為：尚未開通、轉移
             const tagsContainer = card.querySelector('.tags-container');
             tagsContainer.innerHTML = `
                 <span class="status-tag tag-active">尚未開通</span>
                 <span class="status-tag tag-transfer">轉移</span>
             `;
 
-            // 2. 移除接收/退回按鈕，替換成常規的 立即開通/轉移eSIM
             const actionsContainer = card.querySelector('.card-actions');
             actionsContainer.innerHTML = `
                 <button class="btn-main" onclick="openReminderModal('${id}', '${name}')">立即開通</button>
                 <button class="btn-sub-small" style="width:100%;" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
             `;
 
-            // 3. 更新詳細資料綁定
             const detailLink = card.querySelector('.detail-link');
             if(detailLink) {
                 detailLink.setAttribute('onclick', `openDetailsModal('${id}', '${name}', '尚未開通', '美國', '10天')`);
             }
 
             updateBadges();
-            alert("✅ 已成功接收 eSIM！現在可以隨時準備開通了。");
+            // 不再跳出任何 alert，實現無縫操作體驗
         }
 
         function openReminderModal(id, name) { currentId = id; currentName = name; document.getElementById('reminderModal').style.display = 'flex'; }
