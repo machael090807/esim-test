@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM My eSIM V5.3</title>
+    <title>2eSIM My eSIM V5.4 Final</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
 
-        /* 頂部導航欄 (安裝頁面專用) */
+        /* 頂部導航 (安裝頁專用) */
         .nav-header { display: none; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; }
-        .back-btn { font-size: 24px; color: #000; cursor: pointer; text-decoration: none; margin-right: 15px; padding: 5px; }
+        .back-btn { font-size: 28px; color: #000; cursor: pointer; padding: 5px 10px; line-height: 1; }
 
         .tabs { display: flex; background: #e5e5ea; border-radius: 12px; margin: 15px; padding: 3px; position: sticky; top: 10px; z-index: 100; }
         .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; transition: 0.3s; }
@@ -23,13 +23,15 @@
         
         .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; border: 1px solid; margin-right: 5px; }
         .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
+        .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
 
-        .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(36, 129, 156, 0.2); }
         .btn-sub { background: #fff; color: var(--brand-blue); border: 1px solid var(--brand-blue); width: 100%; padding: 12px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .btn-outline-red { background: #fff; color: var(--red); border: 1px solid var(--red); width: 100%; padding: 12px; border-radius: 25px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .btn-copy { background: var(--brand-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
 
-        /* 修正後的彈窗：解決跑版與居中問題 */
+        /* 修正後的彈窗：解決跑版 */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; 
@@ -38,14 +40,12 @@
         .modal { 
             background: white; width: 100%; max-width: 320px; border-radius: 25px; 
             padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: modalFadeIn 0.3s ease-out;
         }
-        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        
+        .modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .modal-icon { width: 40px; height: 40px; border: 2.5px solid var(--status-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: var(--status-yellow); font-weight: bold; font-size: 24px; }
         .modal ul { text-align: left; font-size: 14px; line-height: 1.8; padding-left: 20px; margin-bottom: 25px; color: #3c3c43; }
 
-        /* 安裝引導頁面風格統一 */
+        /* 安裝頁面 */
         #install-guide { display: none; padding: 0 15px 50px; }
         .qr-section { margin: 15px 0; border: 2px dashed var(--brand-blue); padding: 12px; border-radius: 15px; text-align: center; background: #fff; }
         .qr-image { width: 100%; border-radius: 10px; display: block; }
@@ -68,24 +68,64 @@
     </div>
 
     <div class="esim-list active" id="list-0">
-        <div class="esim-card">
+        <div class="esim-card" id="card-my-skt">
             <span class="status-tag tag-active">尚未開通</span>
             <div class="card-info">
                 <h3>南韓 - 7天不限量</h3>
                 <p>截止開通：2026-04-10</p>
             </div>
-            <button class="btn-main" onclick="openReminderModal('南韓 - 7天不限量')">立即開通</button>
-            <button class="btn-sub" onclick="alert('轉移功能演示...')">轉移 eSIM</button>
+            <button class="btn-main" onclick="openReminderModal('card-my-skt', '南韓 - 7天不限量')">立即開通</button>
+            <button class="btn-sub" onclick="openTransferModal('card-my-skt', '南韓 - 7天不限量')">轉移 eSIM</button>
+        </div>
+        
+        <div class="esim-card" id="card-received">
+            <span class="status-tag tag-active">尚未開通</span>
+            <span class="status-tag tag-transfer">轉移</span>
+            <div class="card-info">
+                <h3>日本 - 5天 每日1GB (來自: Michael)</h3>
+                <p>截止開通：2026-03-30</p>
+            </div>
+            <button class="btn-main" onclick="openReminderModal('card-received', '日本 - 5天')">立即開通</button>
+            <button class="btn-sub" onclick="openTransferModal('card-received', '日本 - 5天')">轉移 eSIM</button>
+            <button class="btn-outline-red" onclick="returnOrder('card-received')">退回</button>
         </div>
     </div>
 
-    <div class="esim-list" id="list-1"></div>
-    <div class="esim-list" id="list-2"></div>
+    <div class="esim-list" id="list-1">
+        <div class="esim-card">
+            <span class="status-tag tag-expired">已退回</span>
+            <div class="card-info">
+                <h3>泰國 - 10天 吃到飽</h3>
+                <p>失效時間：<span class="current-time"></span></p>
+            </div>
+        </div>
+        <div class="esim-card">
+            <span class="status-tag tag-expired">已過期</span>
+            <span class="status-tag tag-transfer">轉移</span>
+            <div class="card-info">
+                <h3>越南 - 3天 (來自: Amy)</h3>
+                <p>失效時間：<span class="current-time"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="esim-list" id="list-2">
+        <div class="esim-card" id="transferring-card" style="display:none;">
+            <span class="status-tag tag-transfer">轉移中</span>
+            <div class="card-info">
+                <h3 id="transfer-name"></h3>
+                <p>對象：<span id="target-email"></span></p>
+                <p>申請時間：<span class="current-time"></span></p>
+            </div>
+            <button class="btn-outline-red" onclick="cancelTransfer()">取消轉移</button>
+        </div>
+        <div class="esim-card"><span class="status-tag tag-expired">已轉移</span><h3>新加坡 - 1天</h3><p>完成時間：2026-03-01</p></div>
+    </div>
 
     <div class="modal-overlay" id="reminderModal">
         <div class="modal">
             <div class="modal-icon">!</div>
-            <h2 style="margin:0 0 15px;">貼心提醒</h2>
+            <h2>貼心提醒</h2>
             <ul>
                 <li>本方案有效時間將於抵達目的地國產生流量後，開始計算</li>
                 <li>eSIM開通後只能於本裝置中使用</li>
@@ -93,75 +133,97 @@
                 <li>請務必於開通有效期內開通 eSIM</li>
             </ul>
             <button class="btn-main" onclick="goToInstallGuide()">繼續開通</button>
-            <button class="btn-sub" style="border:none; color:#8e8e93; margin-top:5px;" onclick="closeModal('reminderModal')">取消開通</button>
+            <button class="btn-cancel-text" onclick="closeModal('reminderModal')" style="border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">取消開通</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal">
+            <h3>轉移 eSIM</h3>
+            <p style="font-size:13px; color:#666;">輸入接收者帳號 (123@gmail.com)</p>
+            <input type="email" id="transferEmail" placeholder="123@gmail.com">
+            <button class="btn-main" onclick="checkMember()">確認轉移</button>
+            <button class="btn-sub" onclick="alert('已複製分享連結：https://2esim.com/register')">使用連結分享</button>
+            <button class="btn-cancel-text" onclick="closeModal('transferModal')" style="border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">取消</button>
         </div>
     </div>
 
     <div id="install-guide">
-        <div class="esim-card" style="margin-top: 10px;">
-            <div style="text-align: center;">
-                <h3 id="installingName" style="color:var(--brand-blue); margin-top: 0;">南韓 - 7天不限量</h3>
-                <div class="qr-section">
-                    <img src="qr.jpg" class="qr-image" alt="eSIM QR Code">
-                </div>
-                <p style="font-size: 13px; color: #8e8e93; margin-bottom: 20px;">請長按 QR Code 儲存至相簿</p>
-            </div>
-
+        <div class="esim-card" style="margin-top: 10px; text-align:center;">
+            <h3 id="installingName" style="color:var(--brand-blue); margin-top: 0;"></h3>
+            <div class="qr-section"><img src="qr.jpg" class="qr-image"></div>
+            <p style="font-size: 13px; color: #8e8e93; margin-bottom: 20px;">請長按 QR Code 儲存至相簿</p>
             <div class="instruction-card">
-                <p style="font-size: 14px; font-weight: bold; margin-top:0; color:var(--brand-blue);">📋 手動安裝資訊</p>
-                <div style="margin-bottom: 15px;">
-                    <span style="font-size: 11px; color:#8e8e93;">SM-DP+ 位址</span>
-                    <button onclick="copy('rsp-ios.trillium.travel')" class="btn-copy">複製位址</button>
-                </div>
-                <div>
-                    <span style="font-size: 11px; color:#8e8e93;">啟用碼</span>
-                    <button onclick="copy('8985207220081270553')" class="btn-copy">複製啟用碼</button>
-                </div>
+                <span style="font-size: 11px; color:#8e8e93;">SM-DP+ 位址</span>
+                <button onclick="copy('rsp-ios.trillium.travel')" class="btn-copy">複製位址</button>
+                <span style="font-size: 11px; color:#8e8e93; margin-top:15px; display:block;">啟用碼</span>
+                <button onclick="copy('8985207220081270553')" class="btn-copy">複製啟用碼</button>
             </div>
         </div>
     </div>
 
     <script>
-        let currentEsimName = '';
+        let selectedId = '';
+        let selectedName = '';
+
+        // 更新動態時間
+        const now = new Date();
+        const formattedTime = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        document.querySelectorAll('.current-time').forEach(el => el.innerText = formattedTime);
 
         function switchTab(idx) {
             document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
             document.querySelectorAll('.esim-list').forEach((l, i) => l.classList.toggle('active', i === idx));
+            document.getElementById('install-guide').style.display = 'none';
         }
 
-        function openReminderModal(name) {
-            currentEsimName = name;
+        function openReminderModal(id, name) {
+            selectedId = id; selectedName = name;
             document.getElementById('reminderModal').style.display = 'flex';
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
         function goToInstallGuide() {
             closeModal('reminderModal');
-            // 隱藏列表組件
             document.getElementById('mainTabs').style.display = 'none';
             document.getElementById('list-0').style.display = 'none';
             document.getElementById('pageTitle').style.display = 'none';
-            
-            // 顯示頂部導航與安裝內容
             document.getElementById('navHeader').style.display = 'flex';
-            document.getElementById('installingName').innerText = currentEsimName;
+            document.getElementById('installingName').innerText = selectedName;
             document.getElementById('install-guide').style.display = 'block';
             window.scrollTo(0,0);
         }
 
-        function copy(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target;
-                const originalText = btn.innerText;
-                btn.innerText = "✓ 已複製";
-                btn.style.background = "#34C759";
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.background = "var(--brand-blue)";
-                }, 1500);
-            });
+        function openTransferModal(id, name) {
+            selectedId = id; selectedName = name;
+            document.getElementById('transferModal').style.display = 'flex';
         }
+
+        function checkMember() {
+            const email = document.getElementById('transferEmail').value;
+            if (email === "123@gmail.com") {
+                document.getElementById(selectedId).style.display = 'none';
+                document.getElementById('transfer-name').innerText = selectedName;
+                document.getElementById('target-email').innerText = email;
+                document.getElementById('transferring-card').style.display = 'block';
+                closeModal('transferModal'); switchTab(2);
+            } else { alert("帳號非會員，請點擊連結分享引導對方註冊。"); }
+        }
+
+        function cancelTransfer() {
+            document.getElementById('transferring-card').style.display = 'none';
+            document.getElementById(selectedId).style.display = 'block';
+            switchTab(0);
+        }
+
+        function returnOrder(id) {
+            if(confirm("確定退回此訂單？")) {
+                document.getElementById(id).style.display = 'none';
+                alert("已成功退回給原發送者。");
+            }
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function copy(text) { navigator.clipboard.writeText(text).then(() => alert("✅ 已複製到剪貼簿")); }
     </script>
 </body>
 </html>
