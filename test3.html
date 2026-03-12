@@ -3,52 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V11.4</title>
+    <title>2eSIM 全流程展示 V11.5 (RWD 網格版)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
 
+        /* ================= 佈局容器 (放寬至 1200px 以利電腦版展示) ================= */
+        .max-container { max-width: 1200px; margin: 0 auto; }
+
         /* ================= 首頁樣式 ================= */
         #view-homepage { background: #fff; min-height: 100vh; padding-bottom: 90px; }
-        .home-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #fff; max-width: 1000px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .home-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .home-menu-icon { font-size: 24px; color: var(--brand-blue); font-weight: bold; cursor: pointer; }
         .home-logo { font-size: 22px; font-weight: 900; color: var(--brand-blue); display: flex; align-items: center; gap: 5px; }
         .home-header-actions { display: flex; align-items: center; gap: 12px; }
         .reward-badge { background: #fff9eb; color: #1c1c1e; border: 1.5px solid var(--status-yellow); padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 900; display: flex; align-items: center; box-shadow: 0 2px 6px rgba(242, 186, 73, 0.2); cursor: pointer; transition: 0.2s; }
-        .home-hero { background: linear-gradient(rgba(12, 31, 46, 0.7), rgba(12, 31, 46, 0.9)), url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800') center/cover; padding: 50px 20px 40px; text-align: center; color: white; max-width: 1000px; margin: 0 auto; }
+        .home-hero { background: linear-gradient(rgba(12, 31, 46, 0.7), rgba(12, 31, 46, 0.9)), url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800') center/cover; padding: 50px 20px 40px; text-align: center; color: white; }
         .home-hero h1 { font-size: 32px; margin: 0 0 15px 0; line-height: 1.4; }
         .hl-yellow { color: #ffe600; background: rgba(255, 230, 0, 0.15); padding: 0 5px; }
         .hero-btn-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
         .btn-outline { border: 1.5px solid #fff; background: transparent; color: #fff; padding: 12px 25px; border-radius: 25px; font-weight: bold; font-size: 15px; cursor: pointer; }
         .btn-solid { background: #b0e0e6; color: var(--brand-blue); padding: 12px 25px; border-radius: 25px; font-weight: 900; font-size: 15px; border: none; box-shadow: 0 4px 15px rgba(176, 224, 230, 0.3); cursor: pointer; }
-        .home-slogan { text-align: center; padding: 30px 20px; background: #f4fbfb; max-width: 1000px; margin: 0 auto; }
-        .search-container { max-width: 1000px; margin: -15px auto 0; padding: 20px; background: #fff; border-radius: 25px 25px 0 0; }
+        .home-slogan { text-align: center; padding: 30px 20px; background: #f4fbfb; }
+        .search-container { padding: 20px; background: #fff; border-radius: 25px 25px 0 0; margin-top: -15px; }
         .search-input-box { display: flex; align-items: center; border: 1.5px solid #e5e5ea; border-radius: 30px; padding: 5px 5px 5px 20px; }
         .search-input-box input { border: none; outline: none; flex-grow: 1; font-size: 15px; background: transparent; padding: 10px 0; }
         .line-btn { background: #06c755; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
         /* ================= 共用組件 (導覽、彈窗、卡片) ================= */
         .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 999; display: flex; justify-content: center; pointer-events: none; }
-        .bottom-nav { background: #fff; width: 100%; max-width: 1000px; display: flex; justify-content: space-around; padding: 12px 0 20px; border-radius: 25px 25px 0 0; pointer-events: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
+        .bottom-nav { background: #fff; width: 100%; display: flex; justify-content: space-around; padding: 12px 0 20px; border-radius: 25px 25px 0 0; pointer-events: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; font-weight: bold; cursor: pointer; gap: 4px; position: relative; }
         .nav-item.active { color: var(--brand-blue); }
         .nav-badge { position: absolute; top: -2px; right: -5px; background: var(--red); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
         
         #view-orders { display: none; padding-bottom: 90px; }
-        .nav-header { display: none; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; max-width: 1000px; margin: 0 auto; }
-        .header-container { max-width: 1000px; margin: 0 auto; }
+        .nav-header { display: none; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; }
+        .header-container { padding-top: 10px; }
         .tabs { display: flex; background: #e5e5ea; border-radius: 12px; margin: 15px; padding: 3px; position: sticky; top: 10px; z-index: 100; }
         .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; }
         .tab.active { background: var(--brand-blue); color: #fff; font-weight: bold; }
         .badge { position: absolute; top: -5px; right: 5px; background: var(--red); color: white; font-size: 11px; padding: 2px 7px; border-radius: 12px; display: none; }
-        .esim-list { padding: 0 15px 30px; display: none; max-width: 1000px; margin: 0 auto; gap: 15px; }
-        .esim-list.active { display: flex; flex-direction: column; }
+        
+        /* 核心修復：替換為 CSS Grid 確保排版絕對對齊 */
+        .esim-list { padding: 0 15px 30px; display: none; gap: 15px; }
+        .esim-list.active { display: grid; grid-template-columns: 1fr; }
+        
         #dynamic-returned-container, #dynamic-transfer-container { display: contents; }
         .esim-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
         .card-info { flex-grow: 1; } 
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
-        /* 合併所有按鈕樣式 */
+        /* ================= 按鈕與標籤 ================= */
         .btn-main, .btn-success, .btn-yellow, .btn-main-small, .btn-sub-small, .btn-red-small, .btn-copy { font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; box-sizing: border-box; }
         .btn-main, .btn-success, .btn-yellow { border: none; width: 100%; padding: 14px; border-radius: 25px; }
         .btn-main { background: var(--brand-blue); color: #fff; }
@@ -61,13 +67,15 @@
         .btn-red-small { background: #fff; color: var(--red); border: 1px solid var(--red); }
         .btn-copy { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 12px; margin-top: 5px; }
 
-        /* 標籤與細節樣式 */
         .top-right-actions { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 10; }
         .detail-link, .clickable-text { font-size: 13px; color: var(--brand-blue); cursor: pointer; font-weight: bold; }
         .clickable-text { text-decoration: underline dashed; text-underline-offset: 3px; }
         .simulate-usage-btn { display: none; font-size: 11px; background: #fff; color: var(--green); border: 1.5px solid var(--green); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(52, 199, 89, 0.15); animation: pulse 1.5s infinite; }
         .simulate-usage-btn:hover { background: var(--green); color: white; }
-        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 10px 5px 12px 0; border: 1px solid; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .tags-container { margin-bottom: 5px; }
+        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; margin-right: 5px; border: 1px solid; }
         .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
@@ -76,7 +84,7 @@
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
         .tag-rejected { background: #fff0f0; color: var(--red); border-color: var(--red); }
 
-        /* 彈窗樣式 */
+        /* ================= 彈窗樣式 ================= */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
         .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px 20px; text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
         .modal-close-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #a1a1aa; background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -95,23 +103,27 @@
         .details-content { padding-bottom: 10px; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
-        #install-guide { display: none; padding: 0 15px 50px; max-width: 1000px; margin: 0 auto; }
+        #install-guide { display: none; padding: 0 15px 50px; }
         .selectable-text { font-size: 14px; font-weight: bold; word-break: break-all; margin: 2px 0 8px 0; user-select: all; -webkit-user-select: all; }
         .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-top: 8px; width: 100%; overflow: hidden; }
         .progress-bar-fill { background: var(--status-yellow); height: 100%; width: 95%; border-radius: 2px; }
 
+        /* ================= RWD 響應式排版核心 ================= */
         @media (min-width: 768px) {
-            .esim-list.active { flex-direction: row; flex-wrap: wrap; }
-            .esim-card { width: calc(50% - 7.5px); }
-            #install-guide .esim-card { width: 100%; max-width: 450px; margin: 0 auto; }
+            /* 平板：2 排 */
+            .esim-list.active { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            #install-guide .esim-card { max-width: 450px; margin: 0 auto; }
         }
-        @media (min-width: 1024px) { .esim-card { width: calc(33.333% - 10px); } }
+        @media (min-width: 1024px) { 
+            /* 電腦：3 排，絕對對齊無誤差 */
+            .esim-list.active { grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="bottom-nav-wrapper" id="global-bottom-nav">
-        <div class="bottom-nav">
+    <div class="bottom-nav-wrapper">
+        <div class="bottom-nav max-container" id="global-bottom-nav">
             <div class="nav-item active" id="nav-home" onclick="showView('homepage')"><div class="nav-icon">🏠</div><span>商店</span></div>
             <div class="nav-item" id="nav-orders" onclick="showView('orders')">
                 <div class="nav-badge" id="bottom-nav-badge" style="display: none;"></div><div class="nav-icon">🧾</div><span>我的訂單</span>
@@ -122,7 +134,7 @@
     </div>
 
     <div id="view-homepage">
-        <header class="home-header">
+        <header class="home-header max-container">
             <div class="home-menu-icon">☰</div>
             <div class="home-logo"><span>e∞</span> 2eSIM</div>
             <div class="home-header-actions">
@@ -130,7 +142,7 @@
                 <div style="font-size:24px; cursor:pointer;">🇹🇼</div>
             </div>
         </header>
-        <section class="home-hero">
+        <section class="home-hero max-container">
             <h1>eSIM <span class="hl-yellow">日韓</span> 超低價!<br>每日只要<span class="hl-yellow">28元</span>!</h1>
             <p style="font-size:14px;color:#e5e5ea;margin-bottom:25px">一掃就出發，輕鬆上網無煩惱，2eSIM讓你暢遊全球!</p>
             <div class="hero-btn-group">
@@ -139,7 +151,7 @@
             </div>
             <a href="#" style="color:#b0e0e6;font-size:14px">查看可用裝置</a>
         </section>
-        <div class="search-container">
+        <div class="search-container max-container">
             <div class="search-input-box">
                 <span style="color:#8e8e93;font-size:18px">🔍</span><input type="text" placeholder="日本還是香港"><button class="line-btn">LINE</button>
             </div>
@@ -147,20 +159,20 @@
     </div>
 
     <div id="view-orders">
-        <div class="nav-header" id="navHeader">
+        <div class="nav-header max-container" id="navHeader">
             <div class="back-btn" onclick="returnFromInstallGuide()">‹</div>
             <h3 id="navTitle" style="margin:0;font-size:18px">開通 eSIM</h3>
         </div>
-        <div class="header-container" id="pageTitleContainer">
+        <div class="header-container max-container" id="pageTitleContainer">
             <h2 id="pageTitle" style="padding:20px 20px 5px">我的訂單</h2>
-            <div class="tabs" id="mainTabs">
+            <div class="tabs">
                 <div class="tab active" onclick="switchTab(0)">有效 <span class="badge" id="active-badge"></span></div>
                 <div class="tab" onclick="switchTab(1)">失效</div>
                 <div class="tab" onclick="switchTab(2)">轉移 <span class="badge" id="transfer-badge"></span></div>
             </div>
         </div>
 
-        <div class="esim-list active" id="list-0">
+        <div class="esim-list active max-container" id="list-0">
             <div class="esim-card" id="card-pending-hank">
                 <div class="top-right-actions">
                     <span class="detail-link" onclick="openDetailsModal('card-pending-hank','美國 - 10天','待接受','美國','10天')">訂單詳情 〉</span>
@@ -214,7 +226,7 @@
             </div>
         </div>
 
-        <div class="esim-list" id="list-1">
+        <div class="esim-list max-container" id="list-1">
             <div id="dynamic-returned-container"></div>
             <div class="esim-card">
                 <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-expired-1','泰國 - 10天 50GB','已過期','泰國','10天')">訂單詳情 〉</span></div>
@@ -223,7 +235,7 @@
             </div>
         </div>
 
-        <div class="esim-list" id="list-2">
+        <div class="esim-list max-container" id="list-2">
             <div id="dynamic-transfer-container"></div>
             <div class="esim-card">
                 <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-transferred-1','新加坡 - 1天 漫遊方案','已轉移','新加坡','1天')">訂單詳情 〉</span></div>
@@ -232,12 +244,12 @@
             </div>
         </div>
 
-        <div id="install-guide">
+        <div id="install-guide" class="max-container">
             <div class="esim-card" style="margin-top:5px;text-align:center;padding:15px">
                 <h3 id="installingName" style="color:var(--brand-blue);margin:0 0 10px;font-size:16px"></h3>
-                <div class="qr-section"><img src="qr.jpg" class="qr-image" alt="QR Code"></div>
+                <div class="qr-section" style="margin:5px auto 10px;border:2px dashed var(--brand-blue);padding:8px;border-radius:12px;width:55%;max-width:200px;"><img src="qr.jpg" class="qr-image" alt="QR Code" style="width:100%;border-radius:8px;"></div>
                 <div style="background:#eef7ff;color:var(--brand-blue);font-size:12px;font-weight:bold;display:inline-block;padding:8px 12px;border-radius:12px;margin-bottom:10px">💡 iOS 用戶可直接長按上方 QR Code 加入 eSIM</div>
-                <div class="instruction-card">
+                <div class="instruction-card" style="background:#f9fdff;border:1px solid #dcecf2;border-radius:12px;padding:12px 15px;text-align:left;">
                     <div style="margin-bottom:15px"><span style="font-size:11px;color:#8e8e93">SM-DP+ 位址</span><div class="selectable-text">rsp-ios.trillium.travel</div><button onclick="copyText('rsp-ios.trillium.travel')" class="btn-copy">複製位址</button></div>
                     <div><span style="font-size:11px;color:#8e8e93">啟用碼</span><div class="selectable-text">8985207220081270553</div><button onclick="copyText('8985207220081270553')" class="btn-copy">複製啟用碼</button></div>
                     <div style="text-align:center;margin-top:12px"><span style="color:var(--red);font-size:11px;font-weight:bold">※ 手動安裝時「確認碼」欄位請保留空白</span></div>
@@ -260,19 +272,15 @@
     <div class="modal-overlay" id="detailsModal">
         <div class="modal" style="text-align:left;">
             <button class="modal-close-icon" onclick="closeModal('detailsModal')">×</button>
-            
             <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:15px; gap:12px;">
                 <h3 style="margin:0; font-size:20px;">訂單詳情</h3>
                 <span class="status-tag" id="detail-status" style="margin:0; padding:4px 10px;"></span>
             </div>
-            
             <div style="border-bottom:1px solid #f2f2f7; padding-bottom:15px; margin-bottom:15px;">
                 <div class="detail-row"><span class="detail-label">訂單編號</span><span class="detail-value clickable-text" id="detail-oid" onclick="copyText(this.innerText)"></span></div>
                 <div class="detail-row"><span class="detail-label">訂單時間</span><span class="detail-value" id="detail-otime"></span></div>
             </div>
-            
             <h3 id="detail-prod-name" style="margin:0 0 10px; font-size:18px; color:var(--brand-blue); padding-right:20px;"></h3>
-            
             <div class="detail-row"><span class="detail-label">失效時間</span><span class="detail-value" id="detail-exp">2026-08-23 18:04</span></div>
             <div style="margin-top:5px; margin-bottom:20px;">
                 <div class="detail-row"><span class="detail-label">方案國家</span><span class="detail-value" id="detail-country"></span></div>
@@ -293,13 +301,7 @@
                 </div>
             </details>
             
-            <details>
-                <summary>通話功能</summary>
-                <div class="details-content">
-                    <div style="font-size:13px;color:#8e8e93;display:flex;align-items:center"><span style="color:var(--red);margin-right:5px;font-size:16px">⊗</span> 不支持語音通話與簡訊</div>
-                </div>
-            </details>
-            
+            <details><summary>通話功能</summary><div class="details-content"><div style="font-size:13px;color:#8e8e93;display:flex;align-items:center"><span style="color:var(--red);margin-right:5px;font-size:16px">⊗</span> 不支持語音通話與簡訊</div></div></details>
             <details>
                 <summary>付款與物流資訊</summary>
                 <div class="details-content">
@@ -312,14 +314,7 @@
                     <button class="btn-sub-small" style="width:100%;margin-top:15px;border-radius:10px" onclick="simulateReceiptDownload()">📥 下載收據</button>
                 </div>
             </details>
-            
-            <details>
-                <summary>服務條款與政策</summary>
-                <div class="details-content">
-                    <div style="font-size:12px;color:#8e8e93;line-height:1.6;background:#f9f9fb;padding:12px;border-radius:8px">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div>
-                </div>
-            </details>
-
+            <details><summary>服務條款與政策</summary><div class="details-content"><div style="font-size:12px;color:#8e8e93;line-height:1.6;background:#f9f9fb;padding:12px;border-radius:8px">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div></div></details>
             <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:20px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
         </div>
     </div>
@@ -401,11 +396,9 @@
 
             const pms = ['轉帳','信用卡','銀聯卡'], ps = ['待確認','付款成功','付款失敗','已退款'], pss = ['未出貨','出貨中','已出貨'];
             $('detail-paymethod').innerText = pms[Math.floor(Math.random()*pms.length)];
-            
             $('detail-amount').innerText = 'NT$ ' + amount;
             $('detail-reward-used').innerText = '- NT$ ' + rewardUsed;
             $('detail-reward-earned').innerText = '+ NT$ ' + rewardEarned;
-            
             $('detail-paystatus').innerText = ps[Math.floor(Math.random()*ps.length)];
             $('detail-prodstatus').innerText = pss[Math.floor(Math.random()*pss.length)];
             
