@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V14.4 (極致緊湊版)</title>
+    <title>2eSIM 全流程展示 V14.5 (滿血復活版)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -477,7 +477,7 @@
                             <div class="selectable-text" style="margin-top:2px;">8985207220081270553</div>
                         </div>
                     </div>
-                    <button class="btn-sub-small" style="width:100%; margin-top:12px; border-radius:12px; padding:10px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
+                    <button class="btn-sub-small" style="width:100%; margin-top:15px; border-radius:12px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
                 </div>
             </details>
             
@@ -496,6 +496,20 @@
             </details>
             <details><summary>服務條款與政策</summary><div class="details-content"><div style="font-size:12px;color:#8e8e93;line-height:1.6;background:#f9f9fb;padding:12px;border-radius:8px">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div></div></details>
             <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:20px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reminderModal">
+        <div class="modal">
+            <button class="modal-close-icon" onclick="closeModal('reminderModal')">×</button>
+            <div style="width:40px;height:40px;border:2px solid var(--status-yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;color:var(--status-yellow);font-weight:bold;font-size:24px">!</div>
+            <h3 style="margin-top:0">貼心提醒</h3>
+            <ul style="text-align:left;font-size:14px;color:#666;line-height:1.8;margin-bottom:15px;padding-left:20px;">
+                <li>本方案有效時間將於產生流量後計算</li>
+                <li>開通 eSIM 需於網路環境下進行</li>
+            </ul>
+            <button class="btn-main" onclick="goToInstallGuide()">繼續開通</button>
+            <button class="btn-sub-small" style="border:none;color:#999;margin-top:10px;width:100%" onclick="closeModal('reminderModal')">返回</button>
         </div>
     </div>
 
@@ -521,14 +535,14 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="basicModal">
+    <div class="modal-overlay" id="confirmModal">
         <div class="modal">
-            <button class="modal-close-icon" onclick="closeModal('basicModal')">×</button>
-            <div id="modal-icon" style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;font-weight:bold;font-size:24px"></div>
-            <h3 id="modal-title" style="margin-top:0"></h3>
-            <div id="modal-desc" style="font-size:14px;color:#666;text-align:left;line-height:1.8;margin-bottom:15px"></div>
-            <button class="btn-main" id="modal-primary-btn"></button>
-            <button class="btn-sub-small" style="border:none;color:#999;margin-top:10px;width:100%" onclick="closeModal('basicModal')">返回</button>
+            <button class="modal-close-icon" onclick="closeModal('confirmModal')">×</button>
+            <div style="width:40px;height:40px;border:2.5px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;color:var(--red);font-weight:bold;font-size:24px">?</div>
+            <h3 id="confirmTitle" style="margin-top:0">確認操作</h3>
+            <p id="confirmDesc" style="font-size:14px;color:#666;text-align:left;line-height:1.6"></p>
+            <button class="btn-main" style="background:var(--red)" onclick="executeConfirmAction()">確定</button>
+            <button class="btn-sub-small" style="border:none;color:#999;margin-top:10px;width:100%" onclick="closeModal('confirmModal')">返回</button>
         </div>
     </div>
 
@@ -622,49 +636,43 @@
             document.body.style.overflow = 'hidden'; 
         }
 
-        function openBasicModal(type, args) {
-            let m = $('basicModal'), ic = $('modal-icon'), title = $('modal-title'), desc = $('modal-desc'), btn = $('modal-primary-btn');
-            if(type === 'reminder') {
-                ic.style.border = '2px solid var(--status-yellow)'; ic.style.color = 'var(--status-yellow)'; ic.innerText = '!';
-                title.innerText = '貼心提醒'; btn.style.background = 'var(--brand-blue)'; btn.innerText = '繼續開通';
-                desc.innerHTML = '<ul style="padding-left: 20px;"><li>本方案有效時間將於產生流量後計算</li><li>開通 eSIM 需於網路環境下進行</li></ul>';
-                btn.onclick = goToInstallGuide;
-            } else if(type === 'confirm') {
-                ic.style.border = '2.5px solid var(--red)'; ic.style.color = 'var(--red)'; ic.innerText = '?';
-                title.innerText = args.title; btn.style.background = 'var(--red)'; btn.innerText = '確定';
-                desc.innerText = args.desc; btn.onclick = () => { if(pendingConfirmCallback) pendingConfirmCallback(); closeModal('basicModal'); };
-            } else if(type === 'nonMember') {
-                ic.style.border = '2.5px solid var(--red)'; ic.style.color = 'var(--red)'; ic.innerText = '!';
-                title.innerText = '尚未成為會員'; btn.style.background = 'var(--brand-blue)'; btn.innerText = '複製專屬連結';
-                desc.innerText = '該信箱尚未註冊。請複製專屬連結傳送給對方，註冊後即可接收！';
-                btn.onclick = () => { copySignUpLink(); closeModal('basicModal'); };
-            }
-            m.style.display = 'flex';
+        // ======================= 核心修復區：找回開通與安裝引擎 =======================
+        function openReminderModal(id, name) { 
+            currentId = id; 
+            currentName = name; 
+            $('reminderModal').style.display = 'flex'; 
             document.body.style.overflow = 'hidden'; 
         }
 
         function acceptTransfer(id, name) {
             let card = $(id); if(!card) return;
             card.querySelector('.tags-container').innerHTML = `<span class="status-tag tag-active">尚未開通</span><span class="status-tag tag-transfer">轉移</span>`;
+            // 核心修復：這裏的 HTML 結構與正常卡片一模一樣，沒有 margin-top
             card.querySelector('.card-actions').innerHTML = `
                 <button class="btn-main" onclick="openReminderModal('${id}', '${name}')">立即開通</button>
-                <button class="btn-sub-small" style="width:100%;margin-top:10px;" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
+                <button class="btn-sub-small" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
             `;
             card.querySelector('.detail-link').setAttribute('onclick', `openDetailsModal('${id}', '${name}', '尚未開通', '美國', '10天')`);
             updateBadges();
         }
 
         function goToInstallGuide() {
-            closeModal('basicModal'); $('pageTitleContainer').style.display = 'none';
+            closeModal('reminderModal'); 
+            $('pageTitleContainer').style.display = 'none';
             $$('.esim-list').forEach(l => l.style.display = 'none'); 
-            $('navHeader').style.display = 'flex'; $('installingName').innerText = currentName;
-            $('install-guide').style.display = 'block'; $('global-bottom-nav').style.display = 'none'; 
+            $('navHeader').style.display = 'flex'; 
+            $('installingName').innerText = currentName;
+            $('install-guide').style.display = 'block'; 
+            $('global-bottom-nav').style.display = 'none'; 
             window.scrollTo(0,0);
         }
 
         function returnFromInstallGuide() {
-            $('install-guide').style.display = $('navHeader').style.display = 'none';
-            $('pageTitleContainer').style.display = 'block'; $('global-bottom-nav').style.display = 'flex'; switchTab(0);
+            $('install-guide').style.display = 'none';
+            $('navHeader').style.display = 'none';
+            $('pageTitleContainer').style.display = 'block'; 
+            $('global-bottom-nav').style.display = 'flex'; 
+            switchTab(0);
         }
 
         function updateCardContent(cardId, type) {
@@ -686,8 +694,10 @@
             card.querySelector('.detail-link').setAttribute('onclick', `openDetailsModal('${currentId}', '${currentName}', '開通完成', '依方案', '依方案')`);
             let btn = card.querySelector('.simulate-usage-btn'); if(btn) btn.style.display = 'block';
             
-            $('install-guide').style.display = $('navHeader').style.display = 'none';
-            $('activationSuccessModal').style.display = 'flex'; $('global-bottom-nav').style.display = 'flex';
+            $('install-guide').style.display = 'none';
+            $('navHeader').style.display = 'none';
+            $('activationSuccessModal').style.display = 'flex'; 
+            $('global-bottom-nav').style.display = 'flex';
             document.body.style.overflow = 'hidden'; 
         }
 
@@ -711,13 +721,17 @@
                 let dId = 'dyn-' + Date.now();
                 $('dynamic-transfer-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${currentName}', '轉移中', '依方案', '依方案')">訂單詳情 〉</span></div><div class="tags-container"><span class="status-tag tag-transfer">轉移中</span></div><div class="card-info"><h3>${currentName}</h3><p>對象：${email}</p><p>轉移時間：${getNowTime()}</p></div><div class="card-actions"><button class="btn-red-small" style="width:100%" onclick="openConfirmModal('cancelTransfer', '${currentId}', '${currentName}', this)">取消轉移</button></div></div>`);
                 transferCount++; updateBadges(); closeModal('transferModal'); switchTab(2); 
-            } else { closeModal('transferModal'); openBasicModal('nonMember'); }
+            } else { closeModal('transferModal'); $('nonMemberModal').style.display = 'flex'; }
+        }
+
+        function executeConfirmAction() { 
+            if (pendingConfirmCallback) pendingConfirmCallback(); 
+            closeModal('confirmModal'); 
         }
 
         function openConfirmModal(type, oId, oName, btnEl = null, from = '') {
-            let config = type === 'return' ? 
-                { title: '確認退回', desc: `確定將「${oName}」退回給發送者？` } : 
-                { title: '取消轉移', desc: `確定取消「${oName}」的轉移申請？` };
+            $('confirmTitle').innerText = type === 'return' ? '確認退回' : '取消轉移';
+            $('confirmDesc').innerText = type === 'return' ? `確定將「${oName}」退回給發送者？` : `確定取消「${oName}」的轉移申請？`;
             
             pendingConfirmCallback = () => {
                 if(btnEl) btnEl.closest('.esim-card').remove();
@@ -729,7 +743,8 @@
                 } else { $(oId).style.display = 'flex'; transferCount--; switchTab(0); }
                 updateBadges();
             };
-            openBasicModal('confirm', config);
+            $('confirmModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function copySignUpLink() { navigator.clipboard.writeText('https://www.2esim.net/signup').then(() => alert("✅ 連結已複製")); }
