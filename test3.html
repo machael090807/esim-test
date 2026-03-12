@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V13.0 (進度警戒系統)</title>
+    <title>2eSIM 全流程展示 V14.2 (動態按距修復)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -96,7 +96,7 @@
 
         /* ================= 彈窗與安裝 ================= */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
-        .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px 20px; text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
+        .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px 20px; text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box; overscroll-behavior: contain; }
         .modal-close-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #a1a1aa; background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .modal input { width: 100%; padding: 14px; margin: 15px 0; border: 1.5px solid var(--brand-blue); border-radius: 12px; box-sizing: border-box; text-align: center; font-size: 16px; }
         
@@ -116,7 +116,6 @@
         #install-guide { display: none; padding: 0 15px 50px; }
         .selectable-text { font-size: 14px; font-weight: bold; word-break: break-all; margin: 2px 0 8px 0; user-select: all; -webkit-user-select: all; }
         
-        /* 雙進度條系統：支援黃色(安全)與紅色(警戒) */
         .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-bottom: 12px; width: 100%; overflow: hidden; }
         .progress-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
         .bg-yellow { background: var(--status-yellow); }
@@ -394,6 +393,7 @@
                     <div><span style="font-size:11px;color:#8e8e93">啟用碼</span><div class="selectable-text">8985207220081270553</div><button onclick="copyText('8985207220081270553')" class="btn-copy">複製啟用碼</button></div>
                     <div style="text-align:center;margin-top:12px"><span style="color:var(--red);font-size:11px;font-weight:bold">※ 手動安裝時「確認碼」欄位請保留空白</span></div>
                 </div>
+                <button class="btn-sub-small" style="width:100%; margin-top:15px; border-radius:12px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
                 <button class="btn-success" onclick="finishActivation()">✓ 完成開通</button>
             </div>
         </div>
@@ -438,6 +438,7 @@
                         <div style="margin-bottom:15px"><span style="font-size:11px;color:#8e8e93">SM-DP+ 位址</span><div class="selectable-text">rsp-ios.trillium.travel</div><button onclick="copyText('rsp-ios.trillium.travel')" class="btn-sub-small" style="width:100%;padding:8px;margin-top:5px;">複製位址</button></div>
                         <div><span style="font-size:11px;color:#8e8e93">啟用碼</span><div class="selectable-text">8985207220081270553</div><button onclick="copyText('8985207220081270553')" class="btn-sub-small" style="width:100%;padding:8px;margin-top:5px;">複製啟用碼</button></div>
                     </div>
+                    <button class="btn-sub-small" style="width:100%; margin-top:15px; border-radius:12px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
                 </div>
             </details>
             
@@ -471,6 +472,16 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="nonMemberModal">
+        <div class="modal">
+            <button class="modal-close-icon" onclick="closeModal('nonMemberModal')">×</button>
+            <div style="width:40px;height:40px;border:2.5px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;color:var(--red);font-weight:bold;font-size:24px">!</div>
+            <h3 style="margin-top:0">尚未成為會員</h3>
+            <p style="font-size:14px;color:#666;text-align:left;line-height:1.6">該信箱尚未註冊 2eSIM。<br>請複製專屬連結傳送給對方，註冊後即可接收！</p>
+            <button class="btn-main" onclick="copySignUpLink(); closeModal('nonMemberModal');">複製專屬連結</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="basicModal">
         <div class="modal">
             <button class="modal-close-icon" onclick="closeModal('basicModal')">×</button>
@@ -487,7 +498,12 @@
         const $$ = sel => document.querySelectorAll(sel);
         let currentId = '', currentName = '', transferCount = 0, pendingConfirmCallback = null, currentDetailCardId = ''; 
         
-        $$('.modal-overlay').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) ov.style.display = 'none'; }));
+        $$('.modal-overlay').forEach(ov => ov.addEventListener('click', e => { 
+            if (e.target === ov) {
+                ov.style.display = 'none'; 
+                document.body.style.overflow = ''; 
+            } 
+        }));
 
         const getNowTime = () => { let d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
         const getFutureTime = days => { let d=new Date(); d.setDate(d.getDate()+days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
@@ -495,6 +511,7 @@
         function showView(vid) {
             $('view-homepage').style.display = $('view-orders').style.display = $('view-reward').style.display = 'none';
             $('view-' + vid).style.display = 'block';
+            document.body.style.overflow = ''; 
             
             if(vid !== 'reward') {
                 $$('.nav-item').forEach(el => el.classList.remove('active'));
@@ -527,7 +544,10 @@
         }
         updateBadges();
 
-        function closeModal(id) { $(id).style.display = 'none'; }
+        function closeModal(id) { 
+            $(id).style.display = 'none'; 
+            document.body.style.overflow = ''; 
+        }
 
         function switchTab(idx) {
             $$('#view-orders .tab').forEach((t, i) => t.classList.toggle('active', i === idx));
@@ -560,6 +580,7 @@
             
             $$('details').forEach(d => d.removeAttribute('open'));
             $('detailsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
         }
 
         function openBasicModal(type, args) {
@@ -580,6 +601,7 @@
                 btn.onclick = () => { copySignUpLink(); closeModal('basicModal'); };
             }
             m.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
         }
 
         function acceptTransfer(id, name) {
@@ -594,7 +616,8 @@
             closeModal('basicModal'); $('pageTitleContainer').style.display = 'none';
             $$('.esim-list').forEach(l => l.style.display = 'none'); 
             $('navHeader').style.display = 'flex'; $('installingName').innerText = currentName;
-            $('install-guide').style.display = 'block'; $('global-bottom-nav').style.display = 'none'; window.scrollTo(0,0);
+            $('install-guide').style.display = 'block'; $('global-bottom-nav').style.display = 'none'; 
+            window.scrollTo(0,0);
         }
 
         function returnFromInstallGuide() {
@@ -602,18 +625,14 @@
             $('pageTitleContainer').style.display = 'block'; $('global-bottom-nav').style.display = 'flex'; switchTab(0);
         }
 
-        // 動態生成「開通完成」與「使用中」的雙進度條佈局
         function updateCardContent(cardId, type) {
             let card = $(cardId), info = card.querySelector('.card-info'), html = info.querySelector('h3').outerHTML;
             info.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回')) html += `<p>${p.innerText}</p>`; });
             if(type === 'activated') {
                 html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div style="background:#f2f2f7;border-radius:12px;padding:15px;font-size:13px;color:#3c3c43;line-height:1.6;"><p style="margin:0 0 10px;color:#8e8e93;">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold;text-decoration:underline;">如何切換 eSIM？</a></div>`;
             } else {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p>
-                <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">無限量</span></div>
-                <div class="progress-bar-bg" style="margin-bottom:12px;"><div class="progress-bar-fill bg-yellow" style="width: 100%;"></div></div>
-                <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div>
-                <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 98%;"></div></div>`;
+                // 原有的使用中動態變更邏輯
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">無限量</span></div><div class="progress-bar-bg" style="margin-bottom:12px;"><div class="progress-bar-fill bg-yellow" style="width: 100%;"></div></div><div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div><div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 98%;"></div></div>`;
             }
             info.innerHTML = html;
         }
@@ -628,6 +647,7 @@
             
             $('install-guide').style.display = $('navHeader').style.display = 'none';
             $('activationSuccessModal').style.display = 'flex'; $('global-bottom-nav').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeActivationSuccessModal() { closeModal('activationSuccessModal'); $('pageTitleContainer').style.display = 'block'; switchTab(0); updateBadges(); }
@@ -640,8 +660,7 @@
             card.querySelector('.detail-link').setAttribute('onclick', `openDetailsModal('${cardId}', '${cardName}', '使用中', '依方案', '依方案')`);
         }
 
-        function openTransferModal(id, name) { currentId = id; currentName = name; $('transferEmail').value = '123@gmail.com'; $('emailError').style.display = 'none'; $('transferModal').style.display = 'flex'; }
-        function openReminderModal(id, name) { currentId = id; currentName = name; openBasicModal('reminder'); }
+        function openTransferModal(id, name) { currentId = id; currentName = name; $('transferEmail').value = '123@gmail.com'; $('emailError').style.display = 'none'; $('transferModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 
         function confirmTransferAction() {
             let email = $('transferEmail').value.trim();
@@ -654,28 +673,13 @@
             } else { closeModal('transferModal'); openBasicModal('nonMember'); }
         }
 
-        function openConfirmModal(type, oId, oName, btnEl = null, from = '') {
-            let config = type === 'return' ? 
-                { title: '確認退回', desc: `確定將「${oName}」退回給發送者？` } : 
-                { title: '取消轉移', desc: `確定取消「${oName}」的轉移申請？` };
-            
-            pendingConfirmCallback = () => {
-                if(btnEl) btnEl.closest('.esim-card').remove();
-                if(type === 'return') {
-                    $(oId).style.display = 'none'; 
-                    let dId = 'dyn-' + Date.now();
-                    $('dynamic-returned-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${oName}', '已退回', '依方案', '依方案')">訂單詳情 〉</span></div><div class="tags-container"><span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span></div><div class="card-info"><h3>${oName}</h3>${from ? `<p>來自：${from}</p>` : ''}<p>退回時間：${getNowTime()}</p></div></div>`);
-                    switchTab(1);
-                } else { $(oId).style.display = 'flex'; transferCount--; switchTab(0); }
-                updateBadges();
-            };
-            openBasicModal('confirm', config);
-        }
-
-        function copySignUpLink() { navigator.clipboard.writeText('https://www.2esim.net/signup').then(() => alert("✅ 連結已複製")); }
         function simulateReceiptDownload() { alert("🧾 下載收據PDF (展示)"); }
         function simulateImageDownload() { alert("📥 下載專屬安裝圖片 (展示)"); }
         function copyText(t) { navigator.clipboard.writeText(t).then(() => alert("✅ 複製成功\n\n" + t)); }
+        
+        function simulateOfflinePDFDownload() { 
+            alert("📥 已為您產生【離線安裝指南 PDF】並開始下載！\n\n(實機運作時，即使無網路也能在手機檔案中查看此教學)"); 
+        }
     </script>
 </body>
 </html>
