@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V11.3 (破版修復)</title>
+    <title>2eSIM 全流程展示 V11.4</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -27,19 +27,18 @@
         .search-input-box input { border: none; outline: none; flex-grow: 1; font-size: 15px; background: transparent; padding: 10px 0; }
         .line-btn { background: #06c755; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-        /* ================= 共用導覽 ================= */
+        /* ================= 共用組件 (導覽、彈窗、卡片) ================= */
         .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 999; display: flex; justify-content: center; pointer-events: none; }
         .bottom-nav { background: #fff; width: 100%; max-width: 1000px; display: flex; justify-content: space-around; padding: 12px 0 20px; border-radius: 25px 25px 0 0; pointer-events: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; font-weight: bold; cursor: pointer; gap: 4px; position: relative; }
         .nav-item.active { color: var(--brand-blue); }
         .nav-badge { position: absolute; top: -2px; right: -5px; background: var(--red); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
         
-        /* ================= 訂單頁面 ================= */
         #view-orders { display: none; padding-bottom: 90px; }
         .nav-header { display: none; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; max-width: 1000px; margin: 0 auto; }
         .header-container { max-width: 1000px; margin: 0 auto; }
         .tabs { display: flex; background: #e5e5ea; border-radius: 12px; margin: 15px; padding: 3px; position: sticky; top: 10px; z-index: 100; }
-        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; transition: 0.3s; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; }
         .tab.active { background: var(--brand-blue); color: #fff; font-weight: bold; }
         .badge { position: absolute; top: -5px; right: 5px; background: var(--red); color: white; font-size: 11px; padding: 2px 7px; border-radius: 12px; display: none; }
         .esim-list { padding: 0 15px 30px; display: none; max-width: 1000px; margin: 0 auto; gap: 15px; }
@@ -49,7 +48,7 @@
         .card-info { flex-grow: 1; } 
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
-        /* ================= 按鈕與標籤 ================= */
+        /* 合併所有按鈕樣式 */
         .btn-main, .btn-success, .btn-yellow, .btn-main-small, .btn-sub-small, .btn-red-small, .btn-copy { font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; box-sizing: border-box; }
         .btn-main, .btn-success, .btn-yellow { border: none; width: 100%; padding: 14px; border-radius: 25px; }
         .btn-main { background: var(--brand-blue); color: #fff; }
@@ -62,17 +61,13 @@
         .btn-red-small { background: #fff; color: var(--red); border: 1px solid var(--red); }
         .btn-copy { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 12px; margin-top: 5px; }
 
+        /* 標籤與細節樣式 */
         .top-right-actions { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 10; }
         .detail-link, .clickable-text { font-size: 13px; color: var(--brand-blue); cursor: pointer; font-weight: bold; }
         .clickable-text { text-decoration: underline dashed; text-underline-offset: 3px; }
         .simulate-usage-btn { display: none; font-size: 11px; background: #fff; color: var(--green); border: 1.5px solid var(--green); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 2px 5px rgba(52, 199, 89, 0.15); animation: pulse 1.5s infinite; }
         .simulate-usage-btn:hover { background: var(--green); color: white; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        .tags-container { margin-bottom: 5px; }
-        /* 修復標籤：恢復原廠設定，避免撐破排版 */
-        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin-bottom: 12px; margin-right: 5px; border: 1px solid; }
-        
+        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 10px 5px 12px 0; border: 1px solid; }
         .tag-active { background: #fff9eb; color: var(--status-yellow); border-color: var(--status-yellow); }
         .tag-expired { background: #f2f2f7; color: #8e8e93; border-color: #d1d1d6; }
         .tag-transfer { background: #eef7ff; color: var(--brand-blue); border-color: var(--brand-blue); }
@@ -81,14 +76,12 @@
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
         .tag-rejected { background: #fff0f0; color: var(--red); border-color: var(--red); }
 
-        /* ================= 彈窗樣式 (防破版核心) ================= */
+        /* 彈窗樣式 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
-        /* 增加 box-sizing 確保 Padding 不會撐破 Modal */
         .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px 20px; text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
         .modal-close-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #a1a1aa; background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .modal input { width: 100%; padding: 14px; margin: 15px 0; border: 1.5px solid var(--brand-blue); border-radius: 12px; box-sizing: border-box; text-align: center; font-size: 16px; }
         
-        /* 核心修復：防止 Row 裡面的長文字破版 */
         .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; font-size: 13px; gap: 10px; }
         .detail-label { color: #8e8e93; white-space: nowrap; flex-shrink: 0; }
         .detail-value { font-weight: 600; text-align: right; color: #1c1c1e; word-break: break-word; }
@@ -170,7 +163,7 @@
         <div class="esim-list active" id="list-0">
             <div class="esim-card" id="card-pending-hank">
                 <div class="top-right-actions">
-                    <span class="detail-link" onclick="openDetailsModal('card-pending-hank','美國 - 10天','待接受','美國','10天')">詳細資料 〉</span>
+                    <span class="detail-link" onclick="openDetailsModal('card-pending-hank','美國 - 10天','待接受','美國','10天')">訂單詳情 〉</span>
                     <button class="simulate-usage-btn" onclick="startUsingData('card-pending-hank','美國 - 10天')">🚀 模擬啟用</button>
                 </div>
                 <div class="tags-container" id="tags-hank"><span class="status-tag tag-pending">待接受</span><span class="status-tag tag-transfer">轉移</span></div>
@@ -183,7 +176,7 @@
 
             <div class="esim-card" id="card-rejected-amy">
                 <div class="top-right-actions">
-                    <span class="detail-link" onclick="openDetailsModal('card-rejected-amy','歐洲 - 15天','尚未開通','歐洲','15天')">詳細資料 〉</span>
+                    <span class="detail-link" onclick="openDetailsModal('card-rejected-amy','歐洲 - 15天','尚未開通','歐洲','15天')">訂單詳情 〉</span>
                     <button class="simulate-usage-btn" onclick="startUsingData('card-rejected-amy','歐洲 - 15天')">🚀 模擬啟用</button>
                 </div>
                 <div class="tags-container"><span class="status-tag tag-active">尚未開通</span><span class="status-tag tag-rejected">退回</span></div>
@@ -196,7 +189,7 @@
 
             <div class="esim-card" id="card-active-1">
                 <div class="top-right-actions">
-                    <span class="detail-link" onclick="openDetailsModal('card-active-1','南韓 - 7天不限量 MAX','尚未開通','南韓','7天')">詳細資料 〉</span>
+                    <span class="detail-link" onclick="openDetailsModal('card-active-1','南韓 - 7天不限量 MAX','尚未開通','南韓','7天')">訂單詳情 〉</span>
                     <button class="simulate-usage-btn" onclick="startUsingData('card-active-1','南韓 - 7天不限量 MAX')">🚀 模擬啟用</button>
                 </div>
                 <div class="tags-container"><span class="status-tag tag-active">尚未開通</span></div>
@@ -209,7 +202,7 @@
             
             <div class="esim-card" id="card-active-2">
                 <div class="top-right-actions">
-                    <span class="detail-link" onclick="openDetailsModal('card-active-2','日本 - 5天','尚未開通','日本','5天')">詳細資料 〉</span>
+                    <span class="detail-link" onclick="openDetailsModal('card-active-2','日本 - 5天','尚未開通','日本','5天')">訂單詳情 〉</span>
                     <button class="simulate-usage-btn" onclick="startUsingData('card-active-2','日本 - 5天')">🚀 模擬啟用</button>
                 </div>
                 <div class="tags-container"><span class="status-tag tag-active">尚未開通</span><span class="status-tag tag-transfer">轉移</span></div>
@@ -224,7 +217,7 @@
         <div class="esim-list" id="list-1">
             <div id="dynamic-returned-container"></div>
             <div class="esim-card">
-                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-expired-1','泰國 - 10天 50GB','已過期','泰國','10天')">詳細資料 〉</span></div>
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-expired-1','泰國 - 10天 50GB','已過期','泰國','10天')">訂單詳情 〉</span></div>
                 <div class="tags-container"><span class="status-tag tag-expired">已過期</span></div>
                 <div class="card-info"><h3>泰國 - 10天 50GB</h3><p>失效時間：2026-02-28 23:59</p></div>
             </div>
@@ -233,7 +226,7 @@
         <div class="esim-list" id="list-2">
             <div id="dynamic-transfer-container"></div>
             <div class="esim-card">
-                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-transferred-1','新加坡 - 1天 漫遊方案','已轉移','新加坡','1天')">詳細資料 〉</span></div>
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('card-transferred-1','新加坡 - 1天 漫遊方案','已轉移','新加坡','1天')">訂單詳情 〉</span></div>
                 <div class="tags-container"><span class="status-tag tag-expired">已轉移</span></div>
                 <div class="card-info"><h3>新加坡 - 1天 漫遊方案</h3><p>對象：michael_test@gmail.com</p><p>轉移時間：2026-03-01 10:00</p><p>完成時間：2026-03-01 14:20</p></div>
             </div>
@@ -268,9 +261,9 @@
         <div class="modal" style="text-align:left;">
             <button class="modal-close-icon" onclick="closeModal('detailsModal')">×</button>
             
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap:10px;">
-                <h3 style="margin:0; font-size:20px;">訂購內容</h3>
-                <span class="status-tag" id="detail-status" style="margin:0;"></span>
+            <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:15px; gap:12px;">
+                <h3 style="margin:0; font-size:20px;">訂單詳情</h3>
+                <span class="status-tag" id="detail-status" style="margin:0; padding:4px 10px;"></span>
             </div>
             
             <div style="border-bottom:1px solid #f2f2f7; padding-bottom:15px; margin-bottom:15px;">
@@ -464,7 +457,7 @@
             let card = $(cardId), info = card.querySelector('.card-info'), html = info.querySelector('h3').outerHTML;
             info.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回')) html += `<p>${p.innerText}</p>`; });
             if(type === 'activated') {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="margin-top:15px;font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div class="activation-instruction-box"><p style="margin:0 0 10px">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達後，請切換 eSIM 並開啟漫遊。</p><a href="#" style="color:#1c1c1e;font-weight:bold">如何切換 eSIM？</a></div>`;
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="margin-top:15px;font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div class="activation-instruction-box"><p style="margin:0 0 10px">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達後，請切換 eSIM 並開啟漫遊。</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold">如何切換 eSIM？</a></div>`;
             } else {
                 html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:14px;margin-bottom:10px"><span style="color:#8e8e93">已用流量：</span><span style="color:#1c1c1e;font-weight:bold">0 MB</span></div><hr style="border-top:1px solid #e5e5ea;margin:10px 0"><div style="font-size:14px;margin-bottom:5px"><span style="color:#8e8e93">剩餘時間：</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>`;
             }
@@ -502,7 +495,7 @@
             if (email === "123@gmail.com") {
                 $(currentId).style.display = 'none'; 
                 let dId = 'dyn-' + Date.now();
-                $('dynamic-transfer-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${currentName}', '轉移中', '依方案', '依方案')">詳細資料 〉</span></div><div class="tags-container"><span class="status-tag tag-transfer">轉移中</span></div><div class="card-info"><h3>${currentName}</h3><p>對象：${email}</p><p>轉移時間：${getNowTime()}</p></div><div class="card-actions"><button class="btn-red-small" style="width:100%" onclick="openConfirmModal('cancelTransfer', '${currentId}', '${currentName}', this)">取消轉移</button></div></div>`);
+                $('dynamic-transfer-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${currentName}', '轉移中', '依方案', '依方案')">訂單詳情 〉</span></div><div class="tags-container"><span class="status-tag tag-transfer">轉移中</span></div><div class="card-info"><h3>${currentName}</h3><p>對象：${email}</p><p>轉移時間：${getNowTime()}</p></div><div class="card-actions"><button class="btn-red-small" style="width:100%" onclick="openConfirmModal('cancelTransfer', '${currentId}', '${currentName}', this)">取消轉移</button></div></div>`);
                 transferCount++; updateBadges(); closeModal('transferModal'); switchTab(2); 
             } else { closeModal('transferModal'); openBasicModal('nonMember'); }
         }
@@ -517,7 +510,7 @@
                 if(type === 'return') {
                     $(oId).style.display = 'none'; 
                     let dId = 'dyn-' + Date.now();
-                    $('dynamic-returned-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${oName}', '已退回', '依方案', '依方案')">詳細資料 〉</span></div><div class="tags-container"><span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span></div><div class="card-info"><h3>${oName}</h3>${from ? `<p>來自：${from}</p>` : ''}<p>退回時間：${getNowTime()}</p></div></div>`);
+                    $('dynamic-returned-container').insertAdjacentHTML('afterbegin', `<div class="esim-card" id="${dId}"><div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('${dId}', '${oName}', '已退回', '依方案', '依方案')">訂單詳情 〉</span></div><div class="tags-container"><span class="status-tag tag-expired">已退回</span><span class="status-tag tag-transfer">轉移</span></div><div class="card-info"><h3>${oName}</h3>${from ? `<p>來自：${from}</p>` : ''}<p>退回時間：${getNowTime()}</p></div></div>`);
                     switchTab(1);
                 } else { $(oId).style.display = 'flex'; transferCount--; switchTab(0); }
                 updateBadges();
