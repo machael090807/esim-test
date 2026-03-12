@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V11.5 (RWD 網格版)</title>
+    <title>2eSIM 全流程展示 V11.6 (視覺簡化版)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -110,12 +110,10 @@
 
         /* ================= RWD 響應式排版核心 ================= */
         @media (min-width: 768px) {
-            /* 平板：2 排 */
             .esim-list.active { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             #install-guide .esim-card { max-width: 450px; margin: 0 auto; }
         }
         @media (min-width: 1024px) { 
-            /* 電腦：3 排，絕對對齊無誤差 */
             .esim-list.active { grid-template-columns: repeat(3, 1fr); gap: 25px; }
         }
     </style>
@@ -136,7 +134,7 @@
     <div id="view-homepage">
         <header class="home-header max-container">
             <div class="home-menu-icon">☰</div>
-            <div class="home-logo"><span>2eSIM</span></div>
+            <div class="home-logo">2eSIM</div>
             <div class="home-header-actions">
                 <div class="reward-badge" onclick="alert('目前擁有回饋金：150 元')"><span style="color:#f2ba49;margin-right:4px;font-size:15px">💰</span>$150</div>
                 <div style="font-size:24px; cursor:pointer;">🇹🇼</div>
@@ -396,9 +394,11 @@
 
             const pms = ['轉帳','信用卡','銀聯卡'], ps = ['待確認','付款成功','付款失敗','已退款'], pss = ['未出貨','出貨中','已出貨'];
             $('detail-paymethod').innerText = pms[Math.floor(Math.random()*pms.length)];
+            
             $('detail-amount').innerText = 'NT$ ' + amount;
             $('detail-reward-used').innerText = '- NT$ ' + rewardUsed;
             $('detail-reward-earned').innerText = '+ NT$ ' + rewardEarned;
+            
             $('detail-paystatus').innerText = ps[Math.floor(Math.random()*ps.length)];
             $('detail-prodstatus').innerText = pss[Math.floor(Math.random()*pss.length)];
             
