@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V11.6 (視覺簡化版)</title>
+    <title>2eSIM 全流程展示 V13.0 (進度警戒系統)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
 
-        /* ================= 佈局容器 (放寬至 1200px 以利電腦版展示) ================= */
         .max-container { max-width: 1200px; margin: 0 auto; }
 
         /* ================= 首頁樣式 ================= */
@@ -18,6 +17,7 @@
         .home-logo { font-size: 22px; font-weight: 900; color: var(--brand-blue); display: flex; align-items: center; gap: 5px; }
         .home-header-actions { display: flex; align-items: center; gap: 12px; }
         .reward-badge { background: #fff9eb; color: #1c1c1e; border: 1.5px solid var(--status-yellow); padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 900; display: flex; align-items: center; box-shadow: 0 2px 6px rgba(242, 186, 73, 0.2); cursor: pointer; transition: 0.2s; }
+        .reward-badge:hover { transform: scale(1.05); }
         .home-hero { background: linear-gradient(rgba(12, 31, 46, 0.7), rgba(12, 31, 46, 0.9)), url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&q=80&w=800') center/cover; padding: 50px 20px 40px; text-align: center; color: white; }
         .home-hero h1 { font-size: 32px; margin: 0 0 15px 0; line-height: 1.4; }
         .hl-yellow { color: #ffe600; background: rgba(255, 230, 0, 0.15); padding: 0 5px; }
@@ -30,31 +30,31 @@
         .search-input-box input { border: none; outline: none; flex-grow: 1; font-size: 15px; background: transparent; padding: 10px 0; }
         .line-btn { background: #06c755; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-        /* ================= 共用組件 (導覽、彈窗、卡片) ================= */
+        /* ================= 共用組件 ================= */
         .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 999; display: flex; justify-content: center; pointer-events: none; }
         .bottom-nav { background: #fff; width: 100%; display: flex; justify-content: space-around; padding: 12px 0 20px; border-radius: 25px 25px 0 0; pointer-events: auto; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; font-weight: bold; cursor: pointer; gap: 4px; position: relative; }
         .nav-item.active { color: var(--brand-blue); }
         .nav-badge { position: absolute; top: -2px; right: -5px; background: var(--red); color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
         
-        #view-orders { display: none; padding-bottom: 90px; }
-        .nav-header { display: none; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; }
+        .nav-header { display: flex; align-items: center; padding: 10px 15px; background: var(--bg-color); position: sticky; top: 0; z-index: 200; justify-content: space-between; }
+        .back-btn { font-size: 28px; color: #000; cursor: pointer; padding: 5px 10px; line-height: 1; }
         .header-container { padding-top: 10px; }
+        
         .tabs { display: flex; background: #e5e5ea; border-radius: 12px; margin: 15px; padding: 3px; position: sticky; top: 10px; z-index: 100; }
-        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 10px; color: #8e8e93; position: relative; transition: 0.3s; }
         .tab.active { background: var(--brand-blue); color: #fff; font-weight: bold; }
         .badge { position: absolute; top: -5px; right: 5px; background: var(--red); color: white; font-size: 11px; padding: 2px 7px; border-radius: 12px; display: none; }
         
-        /* 核心修復：替換為 CSS Grid 確保排版絕對對齊 */
+        /* ================= 訂單頁面 ================= */
+        #view-orders { display: none; padding-bottom: 90px; }
         .esim-list { padding: 0 15px 30px; display: none; gap: 15px; }
         .esim-list.active { display: grid; grid-template-columns: 1fr; }
-        
         #dynamic-returned-container, #dynamic-transfer-container { display: contents; }
         .esim-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
         .card-info { flex-grow: 1; } 
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
-        /* ================= 按鈕與標籤 ================= */
         .btn-main, .btn-success, .btn-yellow, .btn-main-small, .btn-sub-small, .btn-red-small, .btn-copy { font-weight: bold; cursor: pointer; font-size: 14px; text-align: center; box-sizing: border-box; }
         .btn-main, .btn-success, .btn-yellow { border: none; width: 100%; padding: 14px; border-radius: 25px; }
         .btn-main { background: var(--brand-blue); color: #fff; }
@@ -84,7 +84,17 @@
         .tag-pending { background: #fff0e6; color: #ff9500; border-color: #ff9500; }
         .tag-rejected { background: #fff0f0; color: var(--red); border-color: var(--red); }
 
-        /* ================= 彈窗樣式 ================= */
+        /* ================= 回饋金明細頁面 ================= */
+        #view-reward { display: none; padding-bottom: 90px; background: #fff; min-height: 100vh; }
+        .reward-card { background: linear-gradient(135deg, #f2ba49, #f7d070); border-radius: 20px; padding: 25px 20px; color: #1c1c1e; text-align: center; box-shadow: 0 10px 20px rgba(242, 186, 73, 0.2); margin: 15px; }
+        .reward-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid #f2f2f7; }
+        .r-title { font-size: 15px; font-weight: bold; color: #1c1c1e; margin-bottom: 6px; }
+        .r-date { font-size: 12px; color: #8e8e93; }
+        .r-right { font-size: 16px; font-weight: 900; }
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+
+        /* ================= 彈窗與安裝 ================= */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
         .modal { position: relative; background: white; width: 100%; max-width: 350px; border-radius: 25px; padding: 25px 20px; text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
         .modal-close-icon { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #a1a1aa; background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -105,13 +115,17 @@
         
         #install-guide { display: none; padding: 0 15px 50px; }
         .selectable-text { font-size: 14px; font-weight: bold; word-break: break-all; margin: 2px 0 8px 0; user-select: all; -webkit-user-select: all; }
-        .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-top: 8px; width: 100%; overflow: hidden; }
-        .progress-bar-fill { background: var(--status-yellow); height: 100%; width: 95%; border-radius: 2px; }
+        
+        /* 雙進度條系統：支援黃色(安全)與紅色(警戒) */
+        .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-bottom: 12px; width: 100%; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+        .bg-yellow { background: var(--status-yellow); }
+        .bg-red { background: var(--red); }
 
-        /* ================= RWD 響應式排版核心 ================= */
         @media (min-width: 768px) {
             .esim-list.active { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             #install-guide .esim-card { max-width: 450px; margin: 0 auto; }
+            .reward-card { max-width: 600px; margin: 20px auto; }
         }
         @media (min-width: 1024px) { 
             .esim-list.active { grid-template-columns: repeat(3, 1fr); gap: 25px; }
@@ -136,7 +150,7 @@
             <div class="home-menu-icon">☰</div>
             <div class="home-logo">2eSIM</div>
             <div class="home-header-actions">
-                <div class="reward-badge" onclick="alert('目前擁有回饋金：150 元')"><span style="color:#f2ba49;margin-right:4px;font-size:15px">💰</span>$150</div>
+                <div class="reward-badge" onclick="showView('reward')"><span style="color:#f2ba49;margin-right:4px;font-size:15px">💰</span>$150</div>
                 <div style="font-size:24px; cursor:pointer;">🇹🇼</div>
             </div>
         </header>
@@ -156,10 +170,63 @@
         </div>
     </div>
 
+    <div id="view-reward">
+        <div class="nav-header max-container" style="display: flex;">
+            <div class="back-btn" onclick="showView('homepage')">‹</div>
+            <h3 style="margin:0;font-size:18px">回饋金明細</h3>
+            <div style="width:28px"></div> 
+        </div>
+
+        <div class="max-container">
+            <div class="reward-card">
+                <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold; opacity: 0.8;">目前可用回饋金</p>
+                <h2 style="margin: 0; font-size: 40px; letter-spacing: 1px;">$150</h2>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchRewardTab(0)">全部</div>
+                <div class="tab" onclick="switchRewardTab(1)">獲得</div>
+                <div class="tab" onclick="switchRewardTab(2)">使用</div>
+            </div>
+
+            <div id="reward-list-container" style="padding-bottom: 30px;">
+                <div class="reward-item type-earn">
+                    <div class="r-left">
+                        <div class="r-title">購買 南韓 - 7天不限量 MAX</div>
+                        <div class="r-date">2026-03-10 14:30</div>
+                    </div>
+                    <div class="r-right text-green">+ $45</div>
+                </div>
+                <div class="reward-item type-spend">
+                    <div class="r-left">
+                        <div class="r-title">訂單折抵 (日本 - 5天)</div>
+                        <div class="r-date">2026-03-05 09:15</div>
+                    </div>
+                    <div class="r-right text-red">- $20</div>
+                </div>
+                <div class="reward-item type-earn">
+                    <div class="r-left">
+                        <div class="r-title">購買 泰國 - 10天 50GB</div>
+                        <div class="r-date">2026-02-28 16:20</div>
+                    </div>
+                    <div class="r-right text-green">+ $25</div>
+                </div>
+                <div class="reward-item type-earn">
+                    <div class="r-left">
+                        <div class="r-title">🎉 新會員註冊禮</div>
+                        <div class="r-date">2026-01-15 10:00</div>
+                    </div>
+                    <div class="r-right text-green">+ $100</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="view-orders">
-        <div class="nav-header max-container" id="navHeader">
+        <div class="nav-header max-container" id="navHeader" style="display: none;">
             <div class="back-btn" onclick="returnFromInstallGuide()">‹</div>
             <h3 id="navTitle" style="margin:0;font-size:18px">開通 eSIM</h3>
+            <div style="width:28px"></div>
         </div>
         <div class="header-container max-container" id="pageTitleContainer">
             <h2 id="pageTitle" style="padding:20px 20px 5px">我的訂單</h2>
@@ -171,6 +238,7 @@
         </div>
 
         <div class="esim-list active max-container" id="list-0">
+            
             <div class="esim-card" id="card-pending-hank">
                 <div class="top-right-actions">
                     <span class="detail-link" onclick="openDetailsModal('card-pending-hank','美國 - 10天','待接受','美國','10天')">訂單詳情 〉</span>
@@ -197,6 +265,26 @@
                 </div>
             </div>
 
+            <div class="esim-card" id="card-activated-taiwan">
+                <div class="top-right-actions">
+                    <span class="detail-link" onclick="openDetailsModal('card-activated-taiwan','台灣 100MB/天','開通完成','台灣','1天')">訂單詳情 〉</span>
+                    <button class="simulate-usage-btn" style="display:block;" onclick="startUsingData('card-activated-taiwan','台灣 100MB/天')">🚀 模擬啟用</button>
+                </div>
+                <div class="tags-container"><span class="status-tag tag-activated">開通完成</span></div>
+                <div class="card-info">
+                    <h3>台灣 100MB/天</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 1天</p>
+                    <div style="font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span>
+                    </div>
+                    <div style="background:#f2f2f7;border-radius:12px;padding:15px;font-size:13px;color:#3c3c43;line-height:1.6;">
+                        <p style="margin:0 0 10px;color:#8e8e93;">請於 <strong style="color:#1c1c1e">2026-08-23 18:04</strong> 前使用流量。</p>
+                        <p style="margin:0 0 12px">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p>
+                        <a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold;text-decoration:underline;">如何切換 eSIM？</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="esim-card" id="card-active-1">
                 <div class="top-right-actions">
                     <span class="detail-link" onclick="openDetailsModal('card-active-1','南韓 - 7天不限量 MAX','尚未開通','南韓','7天')">訂單詳情 〉</span>
@@ -220,6 +308,60 @@
                 <div class="card-actions">
                     <button class="btn-main" onclick="openReminderModal('card-active-2','日本 - 5天')">立即開通</button>
                     <button class="btn-sub-small" onclick="openTransferModal('card-active-2','日本 - 5天')">轉移 eSIM</button>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in1','泰國 - 5天 10GB','使用中','泰國','5天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>泰國 - 5天 10GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:var(--red);font-weight:bold">1.5 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 10 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 15%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">3 天 10 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 70%;"></div></div>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in2','新加坡 - 3天 5GB','使用中','新加坡','3天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>新加坡 - 3天 5GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">4.2 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 5 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 84%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:var(--red);font-weight:bold">12 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 16%;"></div></div>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in3','馬來西亞 - 7天 15GB','使用中','馬來西亞','7天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>馬來西亞 - 7天 15GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:var(--red);font-weight:bold">1.2 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 15 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 8%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:var(--red);font-weight:bold">8 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 5%;"></div></div>
                 </div>
             </div>
         </div>
@@ -351,12 +493,28 @@
         const getFutureTime = days => { let d=new Date(); d.setDate(d.getDate()+days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 
         function showView(vid) {
-            $('view-homepage').style.display = $('view-orders').style.display = 'none';
+            $('view-homepage').style.display = $('view-orders').style.display = $('view-reward').style.display = 'none';
             $('view-' + vid).style.display = 'block';
-            $$('.nav-item').forEach(el => el.classList.remove('active'));
-            $('nav-' + (vid==='homepage' ? 'home' : 'orders')).classList.add('active');
+            
+            if(vid !== 'reward') {
+                $$('.nav-item').forEach(el => el.classList.remove('active'));
+                $('nav-' + (vid==='homepage' ? 'home' : 'orders')).classList.add('active');
+            }
             if(vid === 'orders') switchTab(0);
+            if(vid === 'reward') switchRewardTab(0); 
             window.scrollTo(0,0);
+        }
+
+        function switchRewardTab(idx) {
+            let tabs = $$('#view-reward .tab');
+            tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+            let items = $$('.reward-item');
+            items.forEach(item => {
+                if (idx === 0) item.style.display = 'flex';
+                else if (idx === 1 && item.classList.contains('type-earn')) item.style.display = 'flex';
+                else if (idx === 2 && item.classList.contains('type-spend')) item.style.display = 'flex';
+                else item.style.display = 'none';
+            });
         }
 
         function updateBadges() {
@@ -372,7 +530,7 @@
         function closeModal(id) { $(id).style.display = 'none'; }
 
         function switchTab(idx) {
-            $$('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+            $$('#view-orders .tab').forEach((t, i) => t.classList.toggle('active', i === idx));
             $$('.esim-list').forEach((l, i) => { l.classList.toggle('active', i === idx); l.style.display = ''; });
             $('install-guide').style.display = 'none';
         }
@@ -394,11 +552,9 @@
 
             const pms = ['轉帳','信用卡','銀聯卡'], ps = ['待確認','付款成功','付款失敗','已退款'], pss = ['未出貨','出貨中','已出貨'];
             $('detail-paymethod').innerText = pms[Math.floor(Math.random()*pms.length)];
-            
             $('detail-amount').innerText = 'NT$ ' + amount;
             $('detail-reward-used').innerText = '- NT$ ' + rewardUsed;
             $('detail-reward-earned').innerText = '+ NT$ ' + rewardEarned;
-            
             $('detail-paystatus').innerText = ps[Math.floor(Math.random()*ps.length)];
             $('detail-prodstatus').innerText = pss[Math.floor(Math.random()*pss.length)];
             
@@ -446,13 +602,18 @@
             $('pageTitleContainer').style.display = 'block'; $('global-bottom-nav').style.display = 'flex'; switchTab(0);
         }
 
+        // 動態生成「開通完成」與「使用中」的雙進度條佈局
         function updateCardContent(cardId, type) {
             let card = $(cardId), info = card.querySelector('.card-info'), html = info.querySelector('h3').outerHTML;
             info.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回')) html += `<p>${p.innerText}</p>`; });
             if(type === 'activated') {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="margin-top:15px;font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div class="activation-instruction-box"><p style="margin:0 0 10px">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達後，請切換 eSIM 並開啟漫遊。</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold">如何切換 eSIM？</a></div>`;
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div style="background:#f2f2f7;border-radius:12px;padding:15px;font-size:13px;color:#3c3c43;line-height:1.6;"><p style="margin:0 0 10px;color:#8e8e93;">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold;text-decoration:underline;">如何切換 eSIM？</a></div>`;
             } else {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:14px;margin-bottom:10px"><span style="color:#8e8e93">已用流量：</span><span style="color:#1c1c1e;font-weight:bold">0 MB</span></div><hr style="border-top:1px solid #e5e5ea;margin:10px 0"><div style="font-size:14px;margin-bottom:5px"><span style="color:#8e8e93">剩餘時間：</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>`;
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p>
+                <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">無限量</span></div>
+                <div class="progress-bar-bg" style="margin-bottom:12px;"><div class="progress-bar-fill bg-yellow" style="width: 100%;"></div></div>
+                <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 98%;"></div></div>`;
             }
             info.innerHTML = html;
         }
