@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 全流程展示 V12.0 (回饋金系統)</title>
+    <title>2eSIM 全流程展示 V14.0 (離線支援版)</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -115,8 +115,11 @@
         
         #install-guide { display: none; padding: 0 15px 50px; }
         .selectable-text { font-size: 14px; font-weight: bold; word-break: break-all; margin: 2px 0 8px 0; user-select: all; -webkit-user-select: all; }
-        .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-top: 8px; width: 100%; overflow: hidden; }
-        .progress-bar-fill { background: var(--status-yellow); height: 100%; width: 95%; border-radius: 2px; }
+        
+        .progress-bar-bg { background: #e5e5ea; height: 4px; border-radius: 2px; margin-bottom: 12px; width: 100%; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+        .bg-yellow { background: var(--status-yellow); }
+        .bg-red { background: var(--red); }
 
         @media (min-width: 768px) {
             .esim-list.active { grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -170,7 +173,8 @@
         <div class="nav-header max-container" style="display: flex;">
             <div class="back-btn" onclick="showView('homepage')">‹</div>
             <h3 style="margin:0;font-size:18px">回饋金明細</h3>
-            <div style="width:28px"></div> </div>
+            <div style="width:28px"></div> 
+        </div>
 
         <div class="max-container">
             <div class="reward-card">
@@ -233,6 +237,7 @@
         </div>
 
         <div class="esim-list active max-container" id="list-0">
+            
             <div class="esim-card" id="card-pending-hank">
                 <div class="top-right-actions">
                     <span class="detail-link" onclick="openDetailsModal('card-pending-hank','美國 - 10天','待接受','美國','10天')">訂單詳情 〉</span>
@@ -259,6 +264,26 @@
                 </div>
             </div>
 
+            <div class="esim-card" id="card-activated-taiwan">
+                <div class="top-right-actions">
+                    <span class="detail-link" onclick="openDetailsModal('card-activated-taiwan','台灣 100MB/天','開通完成','台灣','1天')">訂單詳情 〉</span>
+                    <button class="simulate-usage-btn" style="display:block;" onclick="startUsingData('card-activated-taiwan','台灣 100MB/天')">🚀 模擬啟用</button>
+                </div>
+                <div class="tags-container"><span class="status-tag tag-activated">開通完成</span></div>
+                <div class="card-info">
+                    <h3>台灣 100MB/天</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 1天</p>
+                    <div style="font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                        <span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span>
+                    </div>
+                    <div style="background:#f2f2f7;border-radius:12px;padding:15px;font-size:13px;color:#3c3c43;line-height:1.6;">
+                        <p style="margin:0 0 10px;color:#8e8e93;">請於 <strong style="color:#1c1c1e">2026-08-23 18:04</strong> 前使用流量。</p>
+                        <p style="margin:0 0 12px">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p>
+                        <a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold;text-decoration:underline;">如何切換 eSIM？</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="esim-card" id="card-active-1">
                 <div class="top-right-actions">
                     <span class="detail-link" onclick="openDetailsModal('card-active-1','南韓 - 7天不限量 MAX','尚未開通','南韓','7天')">訂單詳情 〉</span>
@@ -282,6 +307,60 @@
                 <div class="card-actions">
                     <button class="btn-main" onclick="openReminderModal('card-active-2','日本 - 5天')">立即開通</button>
                     <button class="btn-sub-small" onclick="openTransferModal('card-active-2','日本 - 5天')">轉移 eSIM</button>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in1','泰國 - 5天 10GB','使用中','泰國','5天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>泰國 - 5天 10GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:var(--red);font-weight:bold">1.5 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 10 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 15%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">3 天 10 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 70%;"></div></div>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in2','新加坡 - 3天 5GB','使用中','新加坡','3天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>新加坡 - 3天 5GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">4.2 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 5 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 84%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:var(--red);font-weight:bold">12 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 16%;"></div></div>
+                </div>
+            </div>
+
+            <div class="esim-card">
+                <div class="top-right-actions"><span class="detail-link" onclick="openDetailsModal('c-in3','馬來西亞 - 7天 15GB','使用中','馬來西亞','7天')">訂單詳情 〉</span></div>
+                <div class="tags-container"><span class="status-tag tag-in-use">使用中</span></div>
+                <div class="card-info">
+                    <h3>馬來西亞 - 7天 15GB</h3>
+                    <p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">總量型 - 依方案</p>
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘流量</span><span style="color:var(--red);font-weight:bold">1.2 GB <span style="color:#8e8e93;font-weight:normal;font-size:12px">/ 15 GB</span></span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 8%;"></div></div>
+                    
+                    <div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;">
+                        <span style="color:#8e8e93">剩餘時間</span><span style="color:var(--red);font-weight:bold">8 小時</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill bg-red" style="width: 5%;"></div></div>
                 </div>
             </div>
         </div>
@@ -314,6 +393,7 @@
                     <div><span style="font-size:11px;color:#8e8e93">啟用碼</span><div class="selectable-text">8985207220081270553</div><button onclick="copyText('8985207220081270553')" class="btn-copy">複製啟用碼</button></div>
                     <div style="text-align:center;margin-top:12px"><span style="color:var(--red);font-size:11px;font-weight:bold">※ 手動安裝時「確認碼」欄位請保留空白</span></div>
                 </div>
+                <button class="btn-sub-small" style="width:100%; margin-top:15px; border-radius:12px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
                 <button class="btn-success" onclick="finishActivation()">✓ 完成開通</button>
             </div>
         </div>
@@ -358,6 +438,7 @@
                         <div style="margin-bottom:15px"><span style="font-size:11px;color:#8e8e93">SM-DP+ 位址</span><div class="selectable-text">rsp-ios.trillium.travel</div><button onclick="copyText('rsp-ios.trillium.travel')" class="btn-sub-small" style="width:100%;padding:8px;margin-top:5px;">複製位址</button></div>
                         <div><span style="font-size:11px;color:#8e8e93">啟用碼</span><div class="selectable-text">8985207220081270553</div><button onclick="copyText('8985207220081270553')" class="btn-sub-small" style="width:100%;padding:8px;margin-top:5px;">複製啟用碼</button></div>
                     </div>
+                    <button class="btn-sub-small" style="width:100%; margin-top:15px; border-radius:12px;" onclick="simulateOfflinePDFDownload()">📥 下載離線安裝指南 (PDF)</button>
                 </div>
             </details>
             
@@ -416,21 +497,18 @@
             $('view-homepage').style.display = $('view-orders').style.display = $('view-reward').style.display = 'none';
             $('view-' + vid).style.display = 'block';
             
-            // 處理底部導覽狀態，回饋金頁面算在首頁下
             if(vid !== 'reward') {
                 $$('.nav-item').forEach(el => el.classList.remove('active'));
                 $('nav-' + (vid==='homepage' ? 'home' : 'orders')).classList.add('active');
             }
             if(vid === 'orders') switchTab(0);
-            if(vid === 'reward') switchRewardTab(0); // 進入回饋金預設顯示全部
+            if(vid === 'reward') switchRewardTab(0); 
             window.scrollTo(0,0);
         }
 
-        // ================= 新增：回饋金頁籤切換邏輯 =================
         function switchRewardTab(idx) {
             let tabs = $$('#view-reward .tab');
             tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
-            
             let items = $$('.reward-item');
             items.forEach(item => {
                 if (idx === 0) item.style.display = 'flex';
@@ -475,11 +553,9 @@
 
             const pms = ['轉帳','信用卡','銀聯卡'], ps = ['待確認','付款成功','付款失敗','已退款'], pss = ['未出貨','出貨中','已出貨'];
             $('detail-paymethod').innerText = pms[Math.floor(Math.random()*pms.length)];
-            
             $('detail-amount').innerText = 'NT$ ' + amount;
             $('detail-reward-used').innerText = '- NT$ ' + rewardUsed;
             $('detail-reward-earned').innerText = '+ NT$ ' + rewardEarned;
-            
             $('detail-paystatus').innerText = ps[Math.floor(Math.random()*ps.length)];
             $('detail-prodstatus').innerText = pss[Math.floor(Math.random()*pss.length)];
             
@@ -531,9 +607,9 @@
             let card = $(cardId), info = card.querySelector('.card-info'), html = info.querySelector('h3').outerHTML;
             info.querySelectorAll('p').forEach(p => { if(p.innerText.includes('來自') || p.innerText.includes('退回')) html += `<p>${p.innerText}</p>`; });
             if(type === 'activated') {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="margin-top:15px;font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div class="activation-instruction-box"><p style="margin:0 0 10px">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達後，請切換 eSIM 並開啟漫遊。</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold">如何切換 eSIM？</a></div>`;
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:13px;color:#8e8e93;display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span>流量有效期限</span><span style="color:#1c1c1e;font-weight:bold;font-size:14px">首次使用後顯示</span></div><div style="background:#f2f2f7;border-radius:12px;padding:15px;font-size:13px;color:#3c3c43;line-height:1.6;"><p style="margin:0 0 10px;color:#8e8e93;">請於 <strong style="color:#1c1c1e">${getFutureTime(10)}</strong> 前使用流量。</p><p style="margin:0 0 12px">抵達目的地國後，請至裝置中的「設定」切換成 eSIM，並開啟 eSIM 的「漫遊」開關，即可開始使用網路</p><a href="https://www.2esim.net/installguide" target="_blank" style="color:#1c1c1e;font-weight:bold;text-decoration:underline;">如何切換 eSIM？</a></div>`;
             } else {
-                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:14px;margin-bottom:10px"><span style="color:#8e8e93">已用流量：</span><span style="color:#1c1c1e;font-weight:bold">0 MB</span></div><hr style="border-top:1px solid #e5e5ea;margin:10px 0"><div style="font-size:14px;margin-bottom:5px"><span style="color:#8e8e93">剩餘時間：</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div><div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>`;
+                html += `<p style="color:#8e8e93;font-size:13px;margin:5px 0 15px">計日型 - 依方案</p><div style="font-size:14px;margin-bottom:10px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘流量</span><span style="color:#1c1c1e;font-weight:bold">無限量</span></div><div class="progress-bar-bg" style="margin-bottom:12px;"><div class="progress-bar-fill bg-yellow" style="width: 100%;"></div></div><div style="font-size:14px;margin-bottom:5px;display:flex;justify-content:space-between;"><span style="color:#8e8e93">剩餘時間</span><span style="color:#1c1c1e;font-weight:bold">6 天 23 小時</span></div><div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow" style="width: 98%;"></div></div>`;
             }
             info.innerHTML = html;
         }
@@ -596,6 +672,11 @@
         function simulateReceiptDownload() { alert("🧾 下載收據PDF (展示)"); }
         function simulateImageDownload() { alert("📥 下載專屬安裝圖片 (展示)"); }
         function copyText(t) { navigator.clipboard.writeText(t).then(() => alert("✅ 複製成功\n\n" + t)); }
+        
+        // 新增：模擬下載離線 PDF
+        function simulateOfflinePDFDownload() { 
+            alert("📥 已為您產生【離線安裝指南 PDF】並開始下載！\n\n(實機運作時，即使無網路也能在手機檔案中查看此教學)"); 
+        }
     </script>
 </body>
 </html>
