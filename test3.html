@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2eSIM 我的訂單 V9.10</title>
+    <title>2eSIM 我的訂單 V9.11</title>
     <style>
         :root { --brand-blue: #24819c; --bg-color: #f2f2f7; --status-yellow: #f2ba49; --red: #ff3b30; --green: #34C759; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #1c1c1e; -webkit-tap-highlight-color: transparent; }
@@ -43,6 +43,7 @@
         .tag-rejected { background: #fff0f0; color: var(--red); border-color: var(--red); }
 
         .card-info { flex-grow: 1; } 
+        /* 原本已經有 gap: 10px 處理按鈕間距了 */
         .card-actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 15px; }
         
         .btn-main { background: var(--brand-blue); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -188,7 +189,7 @@
             </div>
             <div class="card-actions">
                 <button class="btn-main" onclick="openReminderModal('card-active-2', '日本 - 5天')">立即開通</button>
-                <button class="btn-sub-small" style="width:100%; margin-top:10px;" onclick="openTransferModal('card-active-2', '日本 - 5天')">轉移 eSIM</button>
+                <button class="btn-sub-small" style="width:100%;" onclick="openTransferModal('card-active-2', '日本 - 5天')">轉移 eSIM</button>
             </div>
         </div>
     </div>
@@ -300,6 +301,7 @@
                     <div style="font-size: 12px; color: #8e8e93; line-height: 1.6; background: #f9f9fb; padding: 12px; border-radius: 8px;">1. 購買後請於失效時間前啟用，逾期失效。<br>2. 流量使用完畢後將依電信商政策降速或斷網。<br>3. 數位商品經開通或發送後，恕不接受退款。</div>
                 </div>
             </details>
+            <button class="btn-sub-small" style="width: 100%; border:none; color:#999; margin-top:20px; background:#f2f2f7;" onclick="closeModal('detailsModal')">關閉</button>
         </div>
     </div>
 
@@ -482,6 +484,7 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
+        // ================= 核心修復：去除 margin-top，讓 Flexbox gap 自動計算間距 =================
         function acceptTransfer(id, name, fromName) {
             const card = document.getElementById(id);
             if(!card) return;
@@ -492,10 +495,11 @@
                 <span class="status-tag tag-transfer">轉移</span>
             `;
 
+            // 移除了 margin-top:10px; ，完全交給外層的 .card-actions (gap: 10px;) 控制
             const actionsContainer = card.querySelector('.card-actions');
             actionsContainer.innerHTML = `
                 <button class="btn-main" onclick="openReminderModal('${id}', '${name}')">立即開通</button>
-                <button class="btn-sub-small" style="width:100%; margin-top:10px;" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
+                <button class="btn-sub-small" style="width:100%;" onclick="openTransferModal('${id}', '${name}')">轉移 eSIM</button>
             `;
 
             const detailLink = card.querySelector('.detail-link');
@@ -504,7 +508,6 @@
             }
 
             updateBadges();
-            // 已移除 alert 彈窗，讓接收操作更無縫原生
         }
 
         function openReminderModal(id, name) { currentId = id; currentName = name; document.getElementById('reminderModal').style.display = 'flex'; }
